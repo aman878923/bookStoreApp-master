@@ -46,6 +46,7 @@ function Course() {
         </div>
       </div>
     </>
+    
   );
 }
 
