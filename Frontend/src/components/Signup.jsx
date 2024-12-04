@@ -22,7 +22,7 @@ function Signup() {
       password: data.password,
     };
     await axios
-      .post("http://localhost:4001/user/signup", userInfo)
+      .post("https://bookstoreapp-master.onrender.com/user/signup", userInfo)
       .then((res) => {
         if (res.data) {
           toast.success("Signup Successfully");
@@ -49,7 +49,11 @@ function Signup() {
       <div className="min-h-screen flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-lg">
           <div className="modal-box bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-            <form onSubmit={handleSubmit(onSubmit)} method="dialog" className="relative">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              method="dialog"
+              className="relative"
+            >
               <Link
                 to="/"
                 className="btn btn-sm btn-circle btn-ghost absolute right-0 top-0"
@@ -58,7 +62,7 @@ function Signup() {
               </Link>
 
               <h3 className="font-bold text-2xl mb-6 text-center">Signup</h3>
-              
+
               {/* Name Field */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Name</label>
@@ -93,7 +97,9 @@ function Signup() {
 
               {/* Password Field */}
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Password</label>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
                 <input
                   type="password"
                   placeholder="Enter your password"
@@ -105,7 +111,7 @@ function Signup() {
                     This field is required
                   </span>
                 )}
-                
+
                 {/* Password Requirements */}
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-3 bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
                   <p className="font-semibold mb-2">Password must contain:</p>

@@ -9,7 +9,9 @@ function Buy() {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const response = await fetch(`http://localhost:4001/book/${id}`);
+        const response = await fetch(
+          `https://bookstoreapp-master.onrender.com/book/${id}`
+        );
         const data = await response.json();
         setBook(data);
       } catch (error) {
@@ -41,15 +43,19 @@ function Buy() {
             </div>
             <div className="form-control w-full max-w-xs">
               <label className="label">
-                <span className="label-text dark:text-white">Select Quantity</span>
+                <span className="label-text dark:text-white">
+                  Select Quantity
+                </span>
               </label>
-              <select 
+              <select
                 className="select select-bordered dark:bg-slate-700"
                 value={quantity}
                 onChange={(e) => setQuantity(parseInt(e.target.value))}
               >
-                {[1,2,3,4,5,6,7,8,9,10].map((num) => (
-                  <option key={num} value={num}>{num}</option>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
                 ))}
               </select>
             </div>

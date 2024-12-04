@@ -14,7 +14,10 @@ function Contact() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:4001/contact/send", data);
+      await axios.post(
+        "https://bookstoreapp-master.onrender.com/contact/send",
+        data
+      );
       toast.success("Message sent successfully! We'll get back to you soon.");
       reset();
     } catch (error) {

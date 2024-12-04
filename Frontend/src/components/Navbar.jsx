@@ -23,7 +23,7 @@ function Navbar() {
     if (searchTerm.trim()) {
       try {
         const response = await axios.get(
-          `http://localhost:4001/book/search?q=${searchTerm}`
+          `https://bookstoreapp-master.onrender.com/book/search?q=${searchTerm}`
         );
         console.log("Search response:", response.data);
         setSearchResults(response.data);
