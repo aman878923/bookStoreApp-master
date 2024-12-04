@@ -4,6 +4,7 @@ import Login from "./Login";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+
 function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -23,7 +24,6 @@ function Signup() {
     await axios
       .post("http://localhost:4001/user/signup", userInfo)
       .then((res) => {
-        console.log(res.data);
         if (res.data) {
           toast.success("Signup Successfully");
           navigate(from, { replace: true });
@@ -33,92 +33,111 @@ function Signup() {
       .catch((err) => {
         if (err.response) {
           console.log(err);
-          toast.error("Error: " + err.response.data.message);
+          if (Array.isArray(err.response.data.errors)) {
+            err.response.data.errors.forEach((error) => {
+              toast.error(error);
+            });
+          } else {
+            toast.error("Error: " + err.response.data.message);
+          }
         }
       });
   };
+
   return (
     <>
-      <div className="flex h-screen items-center justify-center">
-        <div className=" w-[600px] ">
-          <div className="modal-box">
-            <form onSubmit={handleSubmit(onSubmit)} method="dialog">
-              {/* if there is a button in form, it will close the modal */}
+      <div className="min-h-screen flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-lg">
+          <div className="modal-box bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+            <form onSubmit={handleSubmit(onSubmit)} method="dialog" className="relative">
               <Link
                 to="/"
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                className="btn btn-sm btn-circle btn-ghost absolute right-0 top-0"
               >
                 ✕
               </Link>
 
-              <h3 className="font-bold text-lg">Signup</h3>
-              <div className="mt-4 space-y-2">
-                <span>Name</span>
-                <br />
+              <h3 className="font-bold text-2xl mb-6 text-center">Signup</h3>
+              
+              {/* Name Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Name</label>
                 <input
                   type="text"
                   placeholder="Enter your fullname"
-                  className="w-80 px-3 py-1 border rounded-md outline-none"
+                  className="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-pink-500"
                   {...register("fullname", { required: true })}
                 />
-                <br />
                 {errors.fullname && (
-                  <span className="text-sm text-red-500">
+                  <span className="text-sm text-red-500 mt-1 block">
                     This field is required
                   </span>
                 )}
               </div>
-              {/* Email */}
-              <div className="mt-4 space-y-2">
-                <span>Email</span>
-                <br />
+
+              {/* Email Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Email</label>
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-80 px-3 py-1 border rounded-md outline-none"
+                  className="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-pink-500"
                   {...register("email", { required: true })}
                 />
-                <br />
                 {errors.email && (
-                  <span className="text-sm text-red-500">
+                  <span className="text-sm text-red-500 mt-1 block">
                     This field is required
                   </span>
                 )}
               </div>
-              {/* Password */}
-              <div className="mt-4 space-y-2">
-                <span>Password</span>
-                <br />
+
+              {/* Password Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Password</label>
                 <input
-                  type="text"
+                  type="password"
                   placeholder="Enter your password"
-                  className="w-80 px-3 py-1 border rounded-md outline-none"
+                  className="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-pink-500"
                   {...register("password", { required: true })}
                 />
-                <br />
                 {errors.password && (
-                  <span className="text-sm text-red-500">
+                  <span className="text-sm text-red-500 mt-1 block">
                     This field is required
                   </span>
                 )}
+                
+                {/* Password Requirements */}
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-3 bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+                  <p className="font-semibold mb-2">Password must contain:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>At least 8 characters</li>
+                    <li>Maximum 100 characters</li>
+                    <li>At least one uppercase letter</li>
+                    <li>At least one lowercase letter</li>
+                    <li>At least 2 numbers</li>
+                    <li>At least 1 special character</li>
+                    <li>No spaces allowed</li>
+                  </ul>
+                </div>
               </div>
-              {/* Button */}
-              <div className="flex justify-around mt-4">
-                <button className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200">
+
+              {/* Buttons */}
+              <div className="mt-6 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+                <button className="w-full sm:w-auto bg-pink-500 text-white rounded-md px-6 py-2 hover:bg-pink-700 transition-colors duration-200 font-medium">
                   Signup
                 </button>
-                <p className="text-xl">
-                  Have account?{" "}
+                <div className="text-center sm:text-right">
+                  <span className="text-sm sm:text-base">Have account? </span>
                   <button
-                    className="underline text-blue-500 cursor-pointer"
+                    className="text-sm sm:text-base text-pink-500 hover:text-pink-700 underline font-medium"
                     onClick={() =>
                       document.getElementById("my_modal_3").showModal()
                     }
                   >
                     Login
-                  </button>{" "}
+                  </button>
                   <Login />
-                </p>
+                </div>
               </div>
             </form>
           </div>

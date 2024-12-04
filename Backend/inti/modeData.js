@@ -1,4 +1,7 @@
-const books = [
+import mongoose from 'mongoose';
+import Book from '../model/book.model.js';
+
+const paidBooks = [
     {
       name: "To Kill a Mockingbird",
       price: 15.99,
@@ -34,13 +37,21 @@ const books = [
       image: "https://example.com/image5.jpg",
       title: "A comedic science fiction series by Douglas Adams"
     }
-  ];
-  
-  // You can use the Book model to create new documents
-  books.forEach(book => {
-    const newBook = new book(book);
-    newBook.save((err, book) => {
-      if (err) console.error(err);
-      console.log(`Book saved: ${book.name}`);
-    });
-  });
+];
+
+const seedPaidBooks = async () => {
+    try {
+        const existingPaidBooks = await Book.find({ category: { $ne: "Free" } });
+        
+        if (existingPaidBooks.length === 0) {
+            await Book.insertMany(paidBooks);
+            console.log('Paid books data successfully seeded');
+        } else {
+            console.log('Paid books already exist in database');
+        }
+    } catch (error) {
+        console.error('Error seeding paid books:', error);
+    }
+};
+
+export default seedPaidBooks;
