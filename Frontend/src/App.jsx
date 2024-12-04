@@ -18,13 +18,18 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
-            path="/course"
+            path="/bookStoreApp-master"
+            element={<Navigate to="/" replace />}
+          />
+          <Route
+            path="/course/*"
             element={authUser ? <Courses /> : <Navigate to="/signup" />}
           />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/buy/:id" element={<Buy />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Toaster />
       </div>

@@ -6,7 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import AuthProvider from "./context/AuthProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
+  <BrowserRouter basename="/bookStoreApp-master"s>
     <AuthProvider>
       <div className="dark:bg-slate-900 dark:text-white">
         <App />
