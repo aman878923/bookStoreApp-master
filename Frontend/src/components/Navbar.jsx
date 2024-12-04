@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "./Login";
 import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
-
 import axios from "axios";
+import SearchResults from "./SearchResults";
 
 function Navbar() {
   const [authUser] = useAuth();
@@ -13,32 +12,29 @@ function Navbar() {
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+
   const handleSearch = async (e) => {
     const value = e.target.value;
     setSearchTerm(value);
+  };
 
-    if (value.trim()) {
+  const handleSearchClick = async () => {
+    if (searchTerm.trim()) {
       try {
         const response = await axios.get(
-          `http://localhost:4001/book/search?q=${value}`
+          `http://localhost:4001/book/search?q=${searchTerm}`
         );
+        console.log("Search response:", response.data);
         setSearchResults(response.data);
+        setShowResults(true);
       } catch (error) {
         console.error("Search error:", error);
         setSearchResults([]);
       }
-    } else {
-      setSearchResults([]);
     }
   };
-  const handleSearchClick = async () => {
-    if (searchTerm.trim()) {
-      const response = await axios.get(
-        `http://localhost:4001/book/search?q=${searchTerm}`
-      );
-      setSearchResults(response.data);
-    }
-  };
+
   const element = document.documentElement;
   useEffect(() => {
     if (theme === "dark") {
@@ -66,6 +62,7 @@ function Navbar() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
   const navItems = (
     <>
       <li>
@@ -82,6 +79,7 @@ function Navbar() {
       </li>
     </>
   );
+
   return (
     <>
       <div
@@ -132,7 +130,8 @@ function Navbar() {
                   className="grow outline-none rounded-md px-1 dark:bg-slate-900 dark:text-white w-full max-w-[200px]"
                   placeholder="Search"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleSearch}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
                 />
                 <button
                   onClick={handleSearchClick}
@@ -153,34 +152,6 @@ function Navbar() {
                 </button>
               </label>
             </div>
-
-            {searchResults.length > 0 && (
-              <div className="absolute top-full mt-1 w-full bg-white dark:bg-slate-800 shadow-lg rounded-md p-2 z-50">
-                {searchResults.map((book) => (
-                  <div
-                    key={book._id}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                  >
-                    <a
-                      href={`/course?id=${book._id}`}
-                      className="flex items-center gap-2"
-                    >
-                      <img
-                        src={book.image}
-                        alt={book.name}
-                        className="w-10 h-10 object-cover rounded"
-                      />
-                      <div>
-                        <div className="font-medium">{book.name}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          ${book.price}
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            )}
 
             <label className="swap swap-rotate">
               <input
@@ -224,6 +195,7 @@ function Navbar() {
           </div>
         </div>
       </div>
+      {showResults && <SearchResults searchResults={searchResults} />}
     </>
   );
 }
