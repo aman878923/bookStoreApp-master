@@ -13,6 +13,7 @@ function Navbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [sticky, setSticky] = useState(false);
 
   const handleSearch = async (e) => {
     const value = e.target.value;
@@ -29,7 +30,6 @@ function Navbar() {
         const response = await axios.get(
           `https://bookstoreapp-master.onrender.com/book/search?q=${encodeURIComponent(searchTerm)}`
         );
-        console.log("Search response:", response.data);
         setSearchResults(response.data);
         setShowResults(true);
       } catch (error) {
@@ -52,49 +52,62 @@ function Navbar() {
     }
   }, [theme, element.classList]);
 
-  const [sticky, setSticky] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setSticky(true);
-      } else {
-        setSticky(false);
-      }
+      setSticky(window.scrollY > 0);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navItems = (
     <>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <li>
-        <a href="/course">Course</a>
-      </li>
-      <li>
-        <a href="/contact">Contact</a>
-      </li>
-      <li>
-        <a href="/about">About</a>
-      </li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/course">Course</a></li>
+      <li><a href="/contact">Contact</a></li>
+      <li><a href="/about">About</a></li>
     </>
+  );
+
+  const SearchBar = () => (
+    <label className="w-full px-3 py-2 border rounded-md flex items-center gap-2">
+      <input
+        type="text"
+        className="grow outline-none rounded-md px-1 dark:bg-slate-900 dark:text-white w-full"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={handleSearch}
+        onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
+      />
+      <button
+        onClick={handleSearchClick}
+        className="hover:opacity-80 transition-opacity"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="w-4 h-4 opacity-70"
+        >
+          <path
+            fillRule="evenodd"
+            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+    </label>
   );
 
   return (
     <>
       <div
         className={`w-full max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-20 dark:bg-slate-800 dark:text-white fixed top-0 left-0 right-0 z-50 ${
-          sticky
-            ? "sticky-navbar shadow-md bg-base-200 dark:bg-slate-700 dark:text-white duration-300 transition-all ease-in-out"
-            : ""
+          sticky ? "sticky-navbar shadow-md bg-base-200 dark:bg-slate-700 dark:text-white duration-300 transition-all ease-in-out" : ""
         }`}
       >
-        <div className="navbar flex justify-between items-center">
-          <div className="flex items-center">
+        <div className="navbar flex flex-wrap justify-between items-center gap-2 py-3">
+          <div className="flex-1 flex items-center">
             <div className="dropdown lg:hidden">
               <div tabIndex={0} role="button" className="btn btn-ghost">
                 <svg
@@ -112,49 +125,25 @@ function Navbar() {
                   />
                 </svg>
               </div>
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 dark:bg-slate-800"
-              >
+              <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-72 dark:bg-slate-800">
                 {navItems}
+                <li className="mt-2">
+                  <div className="px-2">
+                    <SearchBar />
+                  </div>
+                </li>
               </ul>
             </div>
-            <a className="text-2xl font-bold cursor-pointer">bookWonder</a>
+            <a className="text-xl md:text-2xl font-bold cursor-pointer">bookWonder</a>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <div className="hidden lg:flex">
               <ul className="menu menu-horizontal px-1">{navItems}</ul>
             </div>
 
             <div className="hidden md:block">
-              <label className="px-3 py-2 border rounded-md flex items-center gap-2">
-                <input
-                  type="text"
-                  className="grow outline-none rounded-md px-1 dark:bg-slate-900 dark:text-white w-full max-w-[200px]"
-                  placeholder="Search"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
-                />
-                <button
-                  onClick={handleSearchClick}
-                  className="hover:opacity-80 transition-opacity"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                    className="w-4 h-4 opacity-70"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </label>
+              <SearchBar />
             </div>
 
             <label className="swap swap-rotate">
@@ -186,10 +175,8 @@ function Navbar() {
             ) : (
               <div>
                 <a
-                  className="bg-black text-white px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer whitespace-nowrap"
-                  onClick={() =>
-                    document.getElementById("my_modal_3").showModal()
-                  }
+                  className="bg-black text-white px-2 md:px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer whitespace-nowrap text-sm md:text-base"
+                  onClick={() => document.getElementById("my_modal_3").showModal()}
                 >
                   Login
                 </a>
