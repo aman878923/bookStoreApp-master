@@ -17,13 +17,17 @@ function Navbar() {
   const handleSearch = async (e) => {
     const value = e.target.value;
     setSearchTerm(value);
+    if (!value.trim()) {
+      setShowResults(false);
+      setSearchResults([]);
+    }
   };
 
   const handleSearchClick = async () => {
     if (searchTerm.trim()) {
       try {
         const response = await axios.get(
-          `https://bookstoreapp-master.onrender.com/book/search?q=${searchTerm}`
+          `https://bookstoreapp-master.onrender.com/book/search?q=${encodeURIComponent(searchTerm)}`
         );
         console.log("Search response:", response.data);
         setSearchResults(response.data);
