@@ -4,6 +4,7 @@ import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
 import axios from "axios";
 import SearchResults from "./SearchResults";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const [authUser] = useAuth();
@@ -28,7 +29,9 @@ function Navbar() {
     if (searchTerm.trim()) {
       try {
         const response = await axios.get(
-          `https://bookstoreapp-master.onrender.com/book/search?q=${encodeURIComponent(searchTerm)}`
+          `https://bookstoreapp-master.onrender.com/book/search?q=${encodeURIComponent(
+            searchTerm
+          )}`
         );
         setSearchResults(response.data);
         setShowResults(true);
@@ -62,10 +65,18 @@ function Navbar() {
 
   const navItems = (
     <>
-      <li><a href="/">Home</a></li>
-      <li><a href="/course">Course</a></li>
-      <li><a href="/contact">Contact</a></li>
-      <li><a href="/about">About</a></li>
+      <li>
+        <Link to="/">Home</Link>
+      </li>
+      <li>
+        <Link to="/course">Course</Link>
+      </li>
+      <li>
+        <Link to="/contact">Contact</Link>
+      </li>
+      <li>
+        <Link to="/about">About</Link>
+      </li>
     </>
   );
 
@@ -103,7 +114,9 @@ function Navbar() {
     <>
       <div
         className={`w-full max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-20 dark:bg-slate-800 dark:text-white fixed top-0 left-0 right-0 z-50 ${
-          sticky ? "sticky-navbar shadow-md bg-base-200 dark:bg-slate-700 dark:text-white duration-300 transition-all ease-in-out" : ""
+          sticky
+            ? "sticky-navbar shadow-md bg-base-200 dark:bg-slate-700 dark:text-white duration-300 transition-all ease-in-out"
+            : ""
         }`}
       >
         <div className="navbar flex flex-wrap justify-between items-center gap-2 py-3">
@@ -125,7 +138,10 @@ function Navbar() {
                   />
                 </svg>
               </div>
-              <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-72 dark:bg-slate-800">
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-72 dark:bg-slate-800"
+              >
                 {navItems}
                 <li className="mt-2">
                   <div className="px-2">
@@ -134,7 +150,9 @@ function Navbar() {
                 </li>
               </ul>
             </div>
-            <a className="text-xl md:text-2xl font-bold cursor-pointer">bookWonder</a>
+            <a className="text-xl md:text-2xl font-bold cursor-pointer">
+              bookWonder
+            </a>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
@@ -176,7 +194,9 @@ function Navbar() {
               <div>
                 <a
                   className="bg-black text-white px-2 md:px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer whitespace-nowrap text-sm md:text-base"
-                  onClick={() => document.getElementById("my_modal_3").showModal()}
+                  onClick={() =>
+                    document.getElementById("my_modal_3").showModal()
+                  }
                 >
                   Login
                 </a>
