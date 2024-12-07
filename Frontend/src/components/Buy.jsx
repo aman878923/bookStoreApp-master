@@ -27,14 +27,14 @@ function Buy() {
     <div className="min-h-screen p-8 dark:bg-slate-800">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row gap-8 items-start">
-          <div className="w-full md:w-1/2">
+          <div className="w-full md:w-1/2 h-[500px]">
             <img
               src={book.image}
               alt={book.name}
-              className="w-full rounded-lg shadow-xl"
+              className="w-full h-full object-contain rounded-lg shadow-xl"
             />
           </div>
-          <div className="w-full md:w-1/2 space-y-6 dark:text-white">
+          <div className="w-full md:w-1/2 space-y-6 dark:text-white p-4 min-h-[500px]">
             <h1 className="text-3xl font-bold">{book.name}</h1>
             <div className="badge badge-secondary">{book.category}</div>
             <p className="text-lg">{book.title}</p>
