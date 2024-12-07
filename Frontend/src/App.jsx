@@ -8,15 +8,20 @@ import About from "./components/About";
 import Contact from "./components/Contact";
 import Buy from "./components/Buy";
 import { useAuth } from "./context/AuthProvider";
+import Navbar from "./components/Navbar";
 
 function App() {
   const [authUser] = useAuth(); // Destructure only what's needed
 
   return (
     <div className="dark:bg-slate-900 dark:text-white">
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/bookStoreApp-master" element={<Navigate to="/" replace />} />
+        <Route
+          path="/bookStoreApp-master"
+          element={<Navigate to="/" replace />}
+        />
         <Route
           path="/course/*"
           element={authUser ? <Courses /> : <Navigate to="/signup" />}

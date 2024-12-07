@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 function About() {
   return (
     <div className="min-h-screen dark:bg-slate-900 pt-8">
-      <Navbar />
+      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
