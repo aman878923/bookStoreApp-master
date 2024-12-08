@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import axios from './api/axios.config'; // Import axios instead of api
 import Home from "./home/Home";
 import Courses from "./courses/Courses";
 import Signup from "./components/Signup";
@@ -13,10 +14,11 @@ import Login from "./components/Login";
 
 function App() {
   const [authUser] = useAuth();
+
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
-        await api.get('/api/csrf-token');
+        await axios.get('/api/csrf-token'); // Use axios to fetch CSRF token
       } catch (error) {
         console.error('Failed to fetch CSRF token:', error);
       }
