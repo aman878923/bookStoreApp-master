@@ -40,15 +40,23 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(
-  csurf({
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    },
-  })
-);
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+  },
+});
+
+// Use CSRF protection for all routes except the CSRF token endpoint
+app.use((req, res, next) => {
+  if (req.path === '/api/csrf-token') {
+    next();
+  } else {
+    csrfProtection(req, res, next);
+  }
+});
+
 app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./home/Home";
@@ -12,7 +12,18 @@ import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 
 function App() {
-  const [authUser] = useAuth(); // Destructure only what's needed
+  const [authUser] = useAuth();
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        await api.get('/api/csrf-token');
+      } catch (error) {
+        console.error('Failed to fetch CSRF token:', error);
+      }
+    };
+
+    fetchCsrfToken();
+  }, []);
 
   return (
     <div className="min-h-screen dark:bg-slate-900 dark:text-white">

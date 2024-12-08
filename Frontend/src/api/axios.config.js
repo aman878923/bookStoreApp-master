@@ -21,33 +21,25 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
 const fetchCSRFToken = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/csrf-token`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(`${BASE_URL}/api/csrf-token`, { withCredentials: true });
     return response.data.csrfToken;
   } catch (error) {
     console.error("Failed to fetch CSRF token:", error);
     throw error;
   }
 };
+
 // Request interceptor
 api.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-
     if (!config.headers["X-CSRF-Token"]) {
       config.headers["X-CSRF-Token"] = await fetchCSRFToken();
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -72,23 +64,19 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      return new Promise((resolve, reject) => {
-        fetchCSRFToken()
-          .then(token => {
-            api.defaults.headers["X-CSRF-Token"] = token;
-            originalRequest.headers["X-CSRF-Token"] = token;
-            processQueue(null, token);
-            resolve(api(originalRequest));
-          })
-          .catch(err => {
-            processQueue(err, null);
-            reject(err);
-          })
-          .finally(() => {
-            isRefreshing = false;
-          });
-      });
+      try {
+        const newToken = await fetchCSRFToken();
+        api.defaults.headers["X-CSRF-Token"] = newToken;
+        processQueue(null, newToken);
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
