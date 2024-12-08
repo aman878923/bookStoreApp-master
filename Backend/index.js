@@ -38,7 +38,7 @@ app.use(
       allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
-
+app.use(express.json());
 app.use(csurf({ cookie: true }));
 app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -65,7 +65,15 @@ mongoose
     console.log("❌ MongoDB connection error:", error);
     process.exit(1);
   });
-
+  app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        message: 'Invalid CSRF token',
+        error: err.message
+      });
+    }
+    next(err);
+  });
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
 app.use("/contact", contactRoute);
