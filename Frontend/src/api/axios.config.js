@@ -1,37 +1,51 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://bookstoreapp-master.onrender.com";
 const api = axios.create({
-  baseURL: "https://bookstoreapp-master.onrender.com", //  your backend URL
+  baseURL: BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
-  // Add this line
-});
-// Add this before response interceptor
-api.interceptors.request.use(async (config) => {
-  if (!config.headers["X-CSRF-Token"]) {
-    const response = await axios.get(
-      "https://bookstoreapp-master.onrender.com/api/csrf-token",
-      {
-        withCredentials: true,
-      }
-    );
-    config.headers["X-CSRF-Token"] = response.data.csrfToken;
-  }
-  return config;
 });
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       localStorage.removeItem("user");
-//       window.location.href = "/login";
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+// Request interceptor
+api.interceptors.request.use(
+  async (config) => {
+    // Add token to request headers
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    // Add CSRF token to request headers
+    if (!config.headers["X-CSRF-Token"]) {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/csrf-token`, {
+          withCredentials: true,
+        });
+        config.headers["X-CSRF-Token"] = response.data.csrfToken;
+      } catch (error) {
+        console.error("Failed to fetch CSRF token:", error);
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
