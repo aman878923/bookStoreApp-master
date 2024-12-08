@@ -36,75 +36,109 @@ function Login() {
         }
       });
   };
+  const handleCloseModal = () => {
+    const modal = document.getElementById("my_modal_3");
+    if (modal) {
+      modal.close();
+    }
+  };
   return (
-    <div>
+    
       <dialog id="my_modal_3" className="modal">
-        <div className="modal-box">
-          <form onSubmit={handleSubmit(onSubmit)} method="dialog">
-            {/* if there is a button in form, it will close the modal */}
-            <Link
-              to="/"
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={() => document.getElementById("my_modal_3").close()}
-            >
-              ✕
-            </Link>
+        <div className="modal-box max-w-sm w-[90%] p-6 bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            method="dialog"
+            className="space-y-4"
+          >
+            {/* Close button */}
+            <button
+  type="button" // Add type to distinguish from form submit
+  className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 dark:text-gray-400"
+  onClick={handleCloseModal}
+  aria-label="Close modal"
+>
+  <svg
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+</button>
 
-            <h3 className="font-bold text-lg">Login</h3>
-            {/* Email */}
-            <div className="mt-4 space-y-2">
-              <span>Email</span>
-              <br />
+            {/* Header */}
+            <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
+              Login
+            </h3>
+
+            {/* Email field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email
+              </label>
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-80 px-3 py-1 border rounded-md outline-none"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 {...register("email", { required: true })}
               />
-              <br />
               {errors.email && (
-                <span className="text-sm text-red-500">
-                  This field is required
-                </span>
-              )}
-            </div>
-            {/* password */}
-            <div className="mt-4 space-y-2">
-              <span>Password</span>
-              <br />
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className="w-80 px-3 py-1 border rounded-md outline-none"
-                {...register("password", { required: true })}
-              />
-              <br />
-              {errors.password && (
-                <span className="text-sm text-red-500">
+                <span className="text-sm text-red-500 mt-1">
                   This field is required
                 </span>
               )}
             </div>
 
-            {/* Button */}
-            <div className="flex justify-around mt-6">
-              <button className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200">
+            {/* Password field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                {...register("password", { required: true })}
+              />
+              {errors.password && (
+                <span className="text-sm text-red-500 mt-1">
+                  This field is required
+                </span>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-4">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors duration-200 font-medium"
+              >
                 Login
               </button>
-              <p>
+
+              <p className="text-sm text-center text-gray-600 dark:text-gray-400">
                 Not registered?{" "}
                 <Link
                   to="/signup"
-                  className="underline text-blue-500 cursor-pointer"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                  onClick={() => document.getElementById("my_modal_3").close()}
                 >
-                  Signup
-                </Link>{" "}
+                  Create an account
+                </Link>
               </p>
             </div>
           </form>
         </div>
       </dialog>
-    </div>
+    
   );
 }
 

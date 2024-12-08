@@ -113,13 +113,13 @@ function Navbar() {
   return (
     <>
       <div
-        className={`w-full max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-20 dark:bg-slate-800 dark:text-white fixed top-0 left-0 right-0 z-50 ${
+        className={`w-full max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-20 dark:bg-slate-800 dark:text-white fixed top-0 left-0 right-0 z-50${
           sticky
             ? "sticky-navbar shadow-md bg-base-200 dark:bg-slate-700 dark:text-white duration-300 transition-all ease-in-out"
             : ""
         }`}
       >
-        <div className="navbar flex flex-wrap justify-between items-center gap-2 py-3">
+        <div className="navbar flex flex-wrap justify-between items-center gap-2 py-2">
           <div className="flex-1 flex items-center">
             <div className="dropdown lg:hidden">
               <div tabIndex={0} role="button" className="btn btn-ghost">
@@ -191,17 +191,19 @@ function Navbar() {
             {authUser ? (
               <Logout />
             ) : (
-              <div>
-                <a
-                  className="bg-black text-white px-2 md:px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer whitespace-nowrap text-sm md:text-base"
-                  onClick={() =>
-                    document.getElementById("my_modal_3").showModal()
+              <button
+                onClick={() => {
+                  const modal = document.getElementById("my_modal_3");
+                  if (modal) {
+                    modal.showModal();
+                  } else {
+                    console.error("Modal element not found");
                   }
-                >
-                  Login
-                </a>
-                <Login />
-              </div>
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm md:text-base font-medium"
+              >
+                Login
+              </button>
             )}
           </div>
         </div>

@@ -9,6 +9,7 @@ import Contact from "./components/Contact";
 import Buy from "./components/Buy";
 import { useAuth } from "./context/AuthProvider";
 import Navbar from "./components/Navbar";
+import Login from "./components/Login";
 
 function App() {
   const [authUser] = useAuth(); // Destructure only what's needed
@@ -16,7 +17,8 @@ function App() {
   return (
     <div className="min-h-screen dark:bg-slate-900 dark:text-white">
       <Navbar />
-      <div className="pt-24">
+      <Login />
+      <div>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
