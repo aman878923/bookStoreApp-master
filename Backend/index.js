@@ -40,7 +40,13 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(csurf({ cookie: true }));
+app.use(csurf({ 
+  cookie: { 
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
+}));
 app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
