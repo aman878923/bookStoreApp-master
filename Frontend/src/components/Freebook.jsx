@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-
+import api from "../api/axios.config";
 import axios from "axios";
 
 import Cards from "./Cards";
@@ -12,7 +12,7 @@ function Freebook() {
   useEffect(() => {
     const getBook = async () => {
       try {
-        const res = await axios.get(
+        const res = await api.get(
           "https://bookstoreapp-master.onrender.com/book"
         );
 

@@ -1,17 +1,25 @@
 import User from "../model/user.model.js";
 import bcryptjs from "bcryptjs";
-import PasswordValidator from 'password-validator';
+import PasswordValidator from "password-validator";
 
 // Create password validation schema
 const schema = new PasswordValidator();
 schema
-  .is().min(8)
-  .is().max(100)
-  .has().uppercase()
-  .has().lowercase()
-  .has().digits(2)
-  .has().symbols(1)
-  .has().not().spaces();
+  .is()
+  .min(8)
+  .is()
+  .max(100)
+  .has()
+  .uppercase()
+  .has()
+  .lowercase()
+  .has()
+  .digits(2)
+  .has()
+  .symbols(1)
+  .has()
+  .not()
+  .spaces();
 
 const getPasswordErrorMessage = (validationResult) => {
   const errorMessages = {
@@ -21,9 +29,11 @@ const getPasswordErrorMessage = (validationResult) => {
     lowercase: "Password must contain at least one lowercase letter",
     digits: "Password must contain at least 2 numbers",
     symbols: "Password must contain at least 1 special character",
-    spaces: "Password cannot contain spaces"
+    spaces: "Password cannot contain spaces",
   };
-  return validationResult.map(error => errorMessages[error.validation] || error.message);
+  return validationResult.map(
+    (error) => errorMessages[error.validation] || error.message
+  );
 };
 
 export const signup = async (req, res) => {
@@ -38,7 +48,7 @@ export const signup = async (req, res) => {
     if (validationResult.length > 0) {
       return res.status(400).json({
         message: "Please check password requirements:",
-        errors: getPasswordErrorMessage(validationResult)
+        errors: getPasswordErrorMessage(validationResult),
       });
     }
 
@@ -69,26 +79,41 @@ export const signup = async (req, res) => {
   }
 };
 
+import jwt from "jsonwebtoken";
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "User not found" });
     }
 
-    const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Invalid password" });
     }
+
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || "your-jwt-secret",
+      { expiresIn: "24h" }
+    );
+
+    // Set session data
+    req.session.userId = user._id;
+
+    // Set HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
 
     res.status(200).json({
-      message: "Login successful!",
+      message: "Login successful",
       user: {
         _id: user._id,
         fullname: user.fullname,
@@ -96,7 +121,21 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in login:", error.message);
-    res.status(500).json({ message: "Login failed. Please try again." });
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Add logout functionality
+export const logout = async (req, res) => {
+  try {
+    // Clear session
+    req.session.destroy();
+
+    // Clear cookie
+    res.clearCookie("token");
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out" });
   }
 };
