@@ -14,25 +14,27 @@ function App() {
   const [authUser] = useAuth(); // Destructure only what's needed
 
   return (
-    <div className="dark:bg-slate-900 dark:text-white">
+    <div className="min-h-screen dark:bg-slate-900 dark:text-white">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/bookStoreApp-master"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/course/*"
-          element={authUser ? <Courses /> : <Navigate to="/signup" />}
-        />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/buy/:id" element={<Buy />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      <Toaster />
+      <div className="pt-24">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/bookStoreApp-master"
+            element={<Navigate to="/" replace />}
+          />
+          <Route
+            path="/course/*"
+            element={authUser ? <Courses /> : <Navigate to="/signup" />}
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/buy/:id" element={<Buy />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        <Toaster />
+      </div>
     </div>
   );
 }
