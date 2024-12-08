@@ -16,7 +16,7 @@ const app = express();
 dotenv.config();
 // Session Configuration
 app.use(cookieParser());
-aapp.use(
+app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
