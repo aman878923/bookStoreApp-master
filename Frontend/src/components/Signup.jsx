@@ -9,11 +9,17 @@ function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+  const preFilledEmail = location.state?.email || "";
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      email: preFilledEmail
+    }
+  });
 
   const onSubmit = async (data) => {
     const userInfo = {
