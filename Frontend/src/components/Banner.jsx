@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import bannerImg from "/public/Banner.png"; // Import banner image
 
 function Banner() {
   const [email, setEmail] = useState("");
@@ -38,53 +39,54 @@ function Banner() {
   };
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row my-10">
-        <div className="w-full order-2 md:order-1 md:w-1/2 mt-12 md:mt-36">
-          <div className="space-y-8">
-            <h1 className="text-2xl md:text-4xl font-bold">
-              Hello, welcomes here to learn something{" "}
-              <span className="text-pink-500">new everyday!!!</span>
-            </h1>
-            <p className="text-sm md:text-xl">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolor,
-              et totam. Tempora amet atque expedita, quae corrupti totam sed
-              pariatur corporis at veniam est voluptas animi!
-            </p>
-            <form onSubmit={handleGetStarted}>
-              <label className="input input-bordered flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  className="w-4 h-4 opacity-70"
-                >
-                  <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-                  <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
-                </svg>
-                <input
-                  type="email"
-                  className="grow"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </label>
-              <button type="submit" className="btn mt-6 btn-secondary">
-                Get Started
-              </button>
-            </form>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col md:flex-row items-center justify-between py-12 md:py-24 gap-8">
+        <div className="w-full md:w-1/2 space-y-6 text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+            Welcome to Our <span className="text-pink-500">Book Store</span>
+            <br />
+            <span className="text-2xl md:text-4xl">Learn Something New Everyday!</span>
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-xl">
+            Discover a world of knowledge with our extensive collection of books. 
+            Start your learning journey today and unlock new possibilities.
+          </p>
+          <form onSubmit={handleGetStarted} className="space-y-4 max-w-md">
+            <div className="flex items-center p-2 border rounded-lg dark:border-gray-600 bg-white dark:bg-gray-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                className="w-5 h-5 text-gray-400 mx-2"
+              >
+                <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
+                <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+              </svg>
+              <input
+                type="email"
+                className="flex-1 p-2 bg-transparent outline-none"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full md:w-auto px-8 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors duration-200 font-medium"
+            >
+              Get Started
+            </button>
+          </form>
         </div>
-        <div className="order-1 w-full mt-20 md:w-1/2">
+        <div className="w-full md:w-1/2">
           <img
-            src={Banner}
-            className="md:w-[550px] md:h-[460px] md:ml-12"
-            alt=""
+            src={bannerImg}
+            alt="Banner illustration"
+            className="w-full max-w-xl mx-auto object-cover rounded-lg shadow-lg"
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
