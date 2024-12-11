@@ -69,7 +69,15 @@ function Buy() {
     }
   };
 
-  const handleEditReview = async (reviewId) => {
+  const handleEditReview = async (reviewId, existingReview) => {
+    if (!editingReview) {
+      // Set up editing mode
+      setEditingReview(reviewId);
+      setReview(existingReview.review);
+      setRating(existingReview.rating);
+      return;
+    }
+
     try {
       const response = await fetch(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews/${reviewId}`,
@@ -129,32 +137,34 @@ function Buy() {
   };
 
   const renderReviews = () => {
-    return book.reviews.map((review) => (
-      <div key={review._id} className="border-b py-4">
+    return book.reviews.map((reviewItem) => (
+      <div key={reviewItem._id} className="border-b py-4">
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-bold">{review.username}</p>
+            <p className="font-bold">{reviewItem.username}</p>
             <div className="flex">
               {[...Array(5)].map((_, index) => (
                 <FaStar
                   key={index}
                   className={
-                    index < review.rating ? "text-yellow-400" : "text-gray-300"
+                    index < reviewItem.rating
+                      ? "text-yellow-400"
+                      : "text-gray-300"
                   }
                 />
               ))}
             </div>
           </div>
-          {authUser && authUser._id === review.userId && (
+          {authUser && authUser._id === reviewItem.userId && (
             <div className="space-x-2">
               <button
-                onClick={() => setEditingReview(review._id)}
+                onClick={() => handleEditReview(reviewItem._id, reviewItem)}
                 className="btn btn-sm btn-info"
               >
-                Edit
+                {editingReview === reviewItem._id ? "Cancel Edit" : "Edit"}
               </button>
               <button
-                onClick={() => handleDeleteReview(review._id)}
+                onClick={() => handleDeleteReview(reviewItem._id)}
                 className="btn btn-sm btn-error"
               >
                 Delete
@@ -162,9 +172,9 @@ function Buy() {
             </div>
           )}
         </div>
-        <p className="mt-2">{review.review}</p>
+        <p className="mt-2">{reviewItem.review}</p>
         <p className="text-sm text-gray-500 mt-1">
-          {new Date(review.createdAt).toLocaleDateString()}
+          {new Date(reviewItem.createdAt).toLocaleDateString()}
         </p>
       </div>
     ));
