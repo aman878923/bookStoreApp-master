@@ -13,7 +13,7 @@ function Freebook() {
     const getBook = async () => {
       try {
         const res = await axios.get(
-          "https://bookstoreapp-master.onrender.com/book"
+          "https://bookstoreapp-master.onrender.com/book",
         );
 
         const data = res.data.filter((data) => data.category === "Free");
@@ -62,20 +62,24 @@ function Freebook() {
   };
   return (
     <>
-      <div className=" max-w-screen-2xl container mx-auto md:px-20 px-4">
-        <div>
+      <div className="max-w-screen-2xl container mx-auto md:px-20 px-4">
+        <div className="mb-8">
           <h1 className="font-semibold text-xl pb-2">Free Offered Courses</h1>
-          <p>
+          <p className="text-gray-600">
             Lorem ipsum dolor sit amet, consectetur adipisicing elit.
             Accusantium veritatis alias pariatur ad dolor repudiandae eligendi
             corporis nulla non suscipit, iure neque earum?
           </p>
         </div>
 
-        <div>
-          <Slider {...settings}>
+        <div className="h-[500px]">
+          <Slider {...settings} className="h-full">
             {book.map((item) => (
-              <Cards item={item} key={item.id} />
+              <div key={item.id} className="px-2 h-full">
+                <div className="h-full">
+                  <Cards item={item} />
+                </div>
+              </div>
             ))}
           </Slider>
         </div>
