@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import { useForm } from "react-hook-form";
@@ -6,6 +6,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 function Signup() {
+  const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
@@ -14,148 +15,259 @@ function Signup() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
       email: preFilledEmail
-    }
+    },
+    mode: "onChange"
   });
 
+  const password = watch("password", "");
+
+  const validatePassword = (value) => {
+    if (!value) return "Password is required";
+    if (value.length < 8) return "Password must be at least 8 characters";
+    if (value.length > 100) return "Password must be less than 100 characters";
+    if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
+    if (!/[a-z]/.test(value)) return "Password must contain at least one lowercase letter";
+    if (!/\d.*\d/.test(value)) return "Password must contain at least 2 numbers";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Password must contain at least 1 special character";
+    if (/\s/.test(value)) return "Password cannot contain spaces";
+    return true;
+  };
+
   const onSubmit = async (data) => {
-    const userInfo = {
-      fullname: data.fullname,
-      email: data.email,
-      password: data.password,
-    };
-    await axios
-      .post("https://bookstoreapp-master.onrender.com/user/signup", userInfo)
-      .then((res) => {
-        if (res.data) {
-          toast.success("Signup Successfully");
-          navigate(from, { replace: true });
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "https://bookstoreapp-master.onrender.com/user/signup",
+        {
+          fullname: data.fullname,
+          email: data.email,
+          password: data.password,
         }
-        localStorage.setItem("Users", JSON.stringify(res.data.user));
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.log(err);
-          if (Array.isArray(err.response.data.errors)) {
-            err.response.data.errors.forEach((error) => {
-              toast.error(error);
-            });
-          } else {
-            toast.error("Error: " + err.response.data.message);
-          }
-        }
-      });
+      );
+
+      if (response.data) {
+        toast.success("Welcome to BookStore! ");
+        localStorage.setItem("Users", JSON.stringify(response.data.user));
+        navigate(from, { replace: true });
+      }
+    } catch (err) {
+      if (err.response?.data?.errors) {
+        const errors = Array.isArray(err.response.data.errors)
+          ? err.response.data.errors
+          : [err.response.data.message];
+        errors.forEach((error) => toast.error(error));
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <>
-      <div className="min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-lg">
-          <div className="modal-box bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              method="dialog"
-              className="relative"
+    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header Section */}
+        <div className="text-center">
+          <h2 className="mt-6 text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
+            Join BookStore
+          </h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Already have an account?{" "}
+            <button
+              onClick={() => document.getElementById("my_modal_3").showModal()}
+              className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300"
             >
-              <Link
-                to="/"
-                className="btn btn-sm btn-circle btn-ghost absolute right-0 top-0"
-              >
-                ✕
-              </Link>
+              Sign in here
+            </button>
+          </p>
+        </div>
 
-              <h3 className="font-bold text-2xl mb-6 text-center">Signup</h3>
-
-              {/* Name Field */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Name</label>
+        {/* Form Section */}
+        <div className="bg-white dark:bg-gray-800 py-8 px-10 shadow-xl rounded-xl backdrop-blur-lg backdrop-filter bg-opacity-90 dark:bg-opacity-90 border border-gray-200 dark:border-gray-700">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Name Field */}
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Full Name
+              </label>
+              <div className="relative">
                 <input
                   type="text"
-                  placeholder="Enter your fullname"
-                  className="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-pink-500"
-                  {...register("fullname", { required: true })}
+                  placeholder="John Doe"
+                  className={`block w-full px-4 py-3 rounded-lg border ${
+                    errors.fullname ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
+                  {...register("fullname", {
+                    required: "Full name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                  })}
                 />
                 {errors.fullname && (
-                  <span className="text-sm text-red-500 mt-1 block">
-                    This field is required
-                  </span>
+                  <p className="mt-1 text-sm text-red-500 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.fullname.message}
+                  </p>
                 )}
               </div>
+            </div>
 
-              {/* Email Field */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Email</label>
+            {/* Email Field */}
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email Address
+              </label>
+              <div className="relative">
                 <input
                   type="email"
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-pink-500"
-                  {...register("email", { required: true })}
+                  placeholder="you@example.com"
+                  className={`block w-full px-4 py-3 rounded-lg border ${
+                    errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
                 />
                 {errors.email && (
-                  <span className="text-sm text-red-500 mt-1 block">
-                    This field is required
-                  </span>
+                  <p className="mt-1 text-sm text-red-500 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
+            </div>
 
-              {/* Password Field */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Password
-                </label>
+            {/* Password Field */}
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Password
+              </label>
+              <div className="relative">
                 <input
                   type="password"
-                  placeholder="Enter your password"
-                  className="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-pink-500"
-                  {...register("password", { required: true })}
+                  placeholder="••••••••"
+                  className={`block w-full px-4 py-3 rounded-lg border ${
+                    errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
+                  {...register("password", { validate: validatePassword })}
                 />
                 {errors.password && (
-                  <span className="text-sm text-red-500 mt-1 block">
-                    This field is required
-                  </span>
+                  <p className="mt-1 text-sm text-red-500 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.password.message}
+                  </p>
                 )}
-
-                {/* Password Requirements */}
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-3 bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
-                  <p className="font-semibold mb-2">Password must contain:</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>At least 8 characters</li>
-                    <li>Maximum 100 characters</li>
-                    <li>At least one uppercase letter</li>
-                    <li>At least one lowercase letter</li>
-                    <li>At least 2 numbers</li>
-                    <li>At least 1 special character</li>
-                    <li>No spaces allowed</li>
-                  </ul>
-                </div>
               </div>
 
-              {/* Buttons */}
-              <div className="mt-6 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
-                <button className="w-full sm:w-auto bg-pink-500 text-white rounded-md px-6 py-2 hover:bg-pink-700 transition-colors duration-200 font-medium">
-                  Signup
-                </button>
-                <div className="text-center sm:text-right">
-                  <span className="text-sm sm:text-base">Have account? </span>
-                  <button
-                    className="text-sm sm:text-base text-pink-500 hover:text-pink-700 underline font-medium"
-                    onClick={() =>
-                      document.getElementById("my_modal_3").showModal()
-                    }
-                  >
-                    Login
-                  </button>
-                  <Login />
-                </div>
+              {/* Password Requirements */}
+              <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password requirements:
+                </p>
+                <ul className="space-y-2">
+                  <li className={`text-sm flex items-center ${password.length >= 8 ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      {password.length >= 8 ? (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      ) : (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    At least 8 characters
+                  </li>
+                  <li className={`text-sm flex items-center ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      {/[A-Z]/.test(password) ? (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      ) : (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    One uppercase letter
+                  </li>
+                  <li className={`text-sm flex items-center ${/\d.*\d/.test(password) ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      {/\d.*\d/.test(password) ? (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      ) : (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    Two numbers
+                  </li>
+                  <li className={`text-sm flex items-center ${/[!@#$%^&*(),.?":{}|<>]/.test(password) ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      {/[!@#$%^&*(),.?":{}|<>]/.test(password) ? (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      ) : (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    One special character
+                  </li>
+                </ul>
               </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Submit Button */}
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex justify-center items-center px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Creating your account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    </>
+      <Login />
+    </div>
   );
 }
 
