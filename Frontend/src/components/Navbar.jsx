@@ -4,9 +4,40 @@ import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
 import axios from "axios";
 import SearchResults from "./SearchResults";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+const SearchBar = ({ searchTerm, onSearch, onSearchClick }) => (
+  <div className="w-full px-3 py-2 border rounded-md flex items-center gap-2 focus-within:border-pink-500 transition-colors">
+    <input
+      type="text"
+      className="grow outline-none rounded-md px-1 dark:bg-slate-900 dark:text-white w-full"
+      placeholder="Search"
+      value={searchTerm}
+      onChange={onSearch}
+      onKeyPress={(e) => e.key === "Enter" && onSearchClick()}
+      autoComplete="off"
+    />
+    <button
+      onClick={onSearchClick}
+      className="hover:opacity-80 transition-opacity"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        fill="currentColor"
+        className="w-4 h-4 opacity-70"
+      >
+        <path
+          fillRule="evenodd"
+          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+        />
+      </svg>
+    </button>
+  </div>
+);
 
 function Navbar() {
+  const navigate = useNavigate();
   const [authUser] = useAuth();
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
@@ -16,7 +47,7 @@ function Navbar() {
   const [showResults, setShowResults] = useState(false);
   const [sticky, setSticky] = useState(false);
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
     if (!value.trim()) {
@@ -33,11 +64,10 @@ function Navbar() {
             searchTerm
           )}`
         );
-        setSearchResults(response.data);
-        setShowResults(true);
+        navigate('/search', { state: { results: response.data, searchTerm } });
       } catch (error) {
         console.error("Search error:", error);
-        setSearchResults([]);
+        navigate('/search', { state: { results: [], searchTerm } });
       }
     }
   };
@@ -80,36 +110,6 @@ function Navbar() {
     </>
   );
 
-  const SearchBar = () => (
-    <label className="w-full px-3 py-2 border rounded-md flex items-center gap-2">
-      <input
-        type="text"
-        className="grow outline-none rounded-md px-1 dark:bg-slate-900 dark:text-white w-full"
-        placeholder="Search"
-        value={searchTerm}
-        onChange={handleSearch}
-        onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
-      />
-      <button
-        onClick={handleSearchClick}
-        className="hover:opacity-80 transition-opacity"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="w-4 h-4 opacity-70"
-        >
-          <path
-            fillRule="evenodd"
-            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
-    </label>
-  );
-
   return (
     <>
       <div
@@ -145,7 +145,11 @@ function Navbar() {
                 {navItems}
                 <li className="mt-2">
                   <div className="px-2">
-                    <SearchBar />
+                    <SearchBar 
+                      searchTerm={searchTerm}
+                      onSearch={handleSearch}
+                      onSearchClick={handleSearchClick}
+                    />
                   </div>
                 </li>
               </ul>
@@ -161,7 +165,11 @@ function Navbar() {
             </div>
 
             <div className="hidden md:block">
-              <SearchBar />
+              <SearchBar 
+                searchTerm={searchTerm}
+                onSearch={handleSearch}
+                onSearchClick={handleSearchClick}
+              />
             </div>
 
             <label className="swap swap-rotate">
@@ -208,7 +216,6 @@ function Navbar() {
           </div>
         </div>
       </div>
-      {showResults && <SearchResults searchResults={searchResults} />}
     </>
   );
 }
