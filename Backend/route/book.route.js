@@ -1,4 +1,3 @@
-// Backend/route/book.route.js
 import express from "express";
 import {
   getBook,
@@ -8,16 +7,15 @@ import {
   updateReview,
   deleteReview,
 } from "../controller/book.controller.js";
+import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/search", searchBooks);
-router.get("/:id", getBookById);
 router.get("/", getBook);
-
-// Review routes
-router.post("/:bookId/reviews", addReview);
-router.put("/:bookId/reviews/:reviewId", updateReview);
-router.delete("/:bookId/reviews/:reviewId", deleteReview);
+router.get("/:id", getBookById);
+router.get("/search", searchBooks);
+router.post("/:id/reviews", authenticateJWT, addReview); // Protected route
+router.put("/:id/reviews/:reviewId", authenticateJWT, updateReview); // Protected route
+router.delete("/:id/reviews/:reviewId", authenticateJWT, deleteReview); // Protected route
 
 export default router;

@@ -1,6 +1,7 @@
 import User from "../model/user.model.js";
 import bcryptjs from "bcryptjs";
 import PasswordValidator from 'password-validator';
+import { generateToken } from '../utils/jwt.js';
 
 // Create password validation schema
 const schema = new PasswordValidator();
@@ -55,6 +56,10 @@ export const signup = async (req, res) => {
     });
 
     await newUser.save();
+
+    // Generate JWT token
+    const token = generateToken({ id: newUser._id, email: newUser.email });
+
     res.status(201).json({
       message: "Registration successful! Please login.",
       user: {
@@ -62,6 +67,7 @@ export const signup = async (req, res) => {
         fullname: newUser.fullname,
         email: newUser.email,
       },
+      token
     });
   } catch (error) {
     console.log("Error in signup:", error.message);
@@ -87,6 +93,9 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    // Generate JWT token
+    const token = generateToken({ id: user._id, email: user.email });
+
     res.status(200).json({
       message: "Login successful!",
       user: {
@@ -94,6 +103,7 @@ export const login = async (req, res) => {
         fullname: user.fullname,
         email: user.email,
       },
+      token
     });
   } catch (error) {
     console.log("Error in login:", error.message);
