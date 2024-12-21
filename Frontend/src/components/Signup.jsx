@@ -19,9 +19,9 @@ function Signup() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      email: preFilledEmail
+      email: preFilledEmail,
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const password = watch("password", "");
@@ -30,10 +30,14 @@ function Signup() {
     if (!value) return "Password is required";
     if (value.length < 8) return "Password must be at least 8 characters";
     if (value.length > 100) return "Password must be less than 100 characters";
-    if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
-    if (!/[a-z]/.test(value)) return "Password must contain at least one lowercase letter";
-    if (!/\d.*\d/.test(value)) return "Password must contain at least 2 numbers";
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Password must contain at least 1 special character";
+    if (!/[A-Z]/.test(value))
+      return "Password must contain at least one uppercase letter";
+    if (!/[a-z]/.test(value))
+      return "Password must contain at least one lowercase letter";
+    if (!/\d.*\d/.test(value))
+      return "Password must contain at least 2 numbers";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value))
+      return "Password must contain at least 1 special character";
     if (/\s/.test(value)) return "Password cannot contain spaces";
     return true;
   };
@@ -47,23 +51,27 @@ function Signup() {
           fullname: data.fullname,
           email: data.email,
           password: data.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
         }
       );
 
       if (response.data) {
-        toast.success("Welcome to BookStore! ");
+        toast.success("Welcome to BookStore!");
         localStorage.setItem("Users", JSON.stringify(response.data.user));
+        // Store the token
+        localStorage.setItem("Token", response.data.token);
         navigate(from, { replace: true });
       }
-    } catch (err) {
-      if (err.response?.data?.errors) {
-        const errors = Array.isArray(err.response.data.errors)
-          ? err.response.data.errors
-          : [err.response.data.message];
-        errors.forEach((error) => toast.error(error));
-      } else {
-        toast.error("Something went wrong. Please try again.");
-      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Signup failed. Please try again.";
+      toast.error(errorMessage);
+      console.log("Signup error:", error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -101,7 +109,9 @@ function Signup() {
                   type="text"
                   placeholder="John Doe"
                   className={`block w-full px-4 py-3 rounded-lg border ${
-                    errors.fullname ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                    errors.fullname
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
                   {...register("fullname", {
                     required: "Full name is required",
@@ -113,8 +123,16 @@ function Signup() {
                 />
                 {errors.fullname && (
                   <p className="mt-1 text-sm text-red-500 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     {errors.fullname.message}
                   </p>
@@ -132,7 +150,9 @@ function Signup() {
                   type="email"
                   placeholder="you@example.com"
                   className={`block w-full px-4 py-3 rounded-lg border ${
-                    errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                    errors.email
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
                   {...register("email", {
                     required: "Email is required",
@@ -144,8 +164,16 @@ function Signup() {
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-500 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     {errors.email.message}
                   </p>
@@ -163,14 +191,24 @@ function Signup() {
                   type="password"
                   placeholder="••••••••"
                   className={`block w-full px-4 py-3 rounded-lg border ${
-                    errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                    errors.password
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
                   {...register("password", { validate: validatePassword })}
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-500 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     {errors.password.message}
                   </p>
@@ -183,42 +221,114 @@ function Signup() {
                   Password requirements:
                 </p>
                 <ul className="space-y-2">
-                  <li className={`text-sm flex items-center ${password.length >= 8 ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <li
+                    className={`text-sm flex items-center ${
+                      password.length >= 8
+                        ? "text-green-500"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       {password.length >= 8 ? (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       ) : (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                          clipRule="evenodd"
+                        />
                       )}
                     </svg>
                     At least 8 characters
                   </li>
-                  <li className={`text-sm flex items-center ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <li
+                    className={`text-sm flex items-center ${
+                      /[A-Z]/.test(password)
+                        ? "text-green-500"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       {/[A-Z]/.test(password) ? (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       ) : (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                          clipRule="evenodd"
+                        />
                       )}
                     </svg>
                     One uppercase letter
                   </li>
-                  <li className={`text-sm flex items-center ${/\d.*\d/.test(password) ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <li
+                    className={`text-sm flex items-center ${
+                      /\d.*\d/.test(password)
+                        ? "text-green-500"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       {/\d.*\d/.test(password) ? (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       ) : (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                          clipRule="evenodd"
+                        />
                       )}
                     </svg>
                     Two numbers
                   </li>
-                  <li className={`text-sm flex items-center ${/[!@#$%^&*(),.?":{}|<>]/.test(password) ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <li
+                    className={`text-sm flex items-center ${
+                      /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                        ? "text-green-500"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       {/[!@#$%^&*(),.?":{}|<>]/.test(password) ? (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       ) : (
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                          clipRule="evenodd"
+                        />
                       )}
                     </svg>
                     One special character
