@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { FaStar, FaShoppingCart, FaMinus, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaStar,
+  FaShoppingCart,
+  FaMinus,
+  FaPlus,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
 import { useAuth } from "../context/AuthProvider";
 import toast from "react-hot-toast";
 
@@ -44,99 +51,81 @@ function Buy() {
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews`,
         {
-          method: "POST",
+          userId: authUser._id,
+          username: authUser.fullname,
+          rating,
+          review,
+        },
+        {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem("Token")}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            userId: authUser._id,
-            username: authUser.fullname,
-            rating,
-            review,
-          }),
         }
       );
 
-      if (response.ok) {
+      if (response.data) {
         toast.success("Review submitted successfully");
         setReview("");
         setRating(5);
         fetchBook();
-      } else {
-        toast.error("Failed to submit review");
       }
     } catch (error) {
-      console.error("Error submitting review:", error);
-      toast.error("Error submitting review");
+      toast.error(error.response?.data?.message || "Failed to submit review");
     }
   };
 
-  const handleEditReview = async (reviewId, existingReview) => {
-    if (!editingReview) {
-      setEditingReview(reviewId);
-      setReview(existingReview.review);
-      setRating(existingReview.rating);
-      return;
-    }
-
+  const handleEditReview = async (reviewId) => {
     try {
-      const response = await fetch(
+      const response = await axios.put(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews/${reviewId}`,
         {
-          method: "PUT",
+          userId: authUser._id,
+          rating,
+          review,
+        },
+        {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem("Token")}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            userId: authUser._id,
-            rating,
-            review,
-          }),
         }
       );
 
-      if (response.ok) {
+      if (response.data) {
         toast.success("Review updated successfully");
         setEditingReview(null);
         setReview("");
         setRating(5);
         fetchBook();
-      } else {
-        toast.error("Failed to update review");
       }
     } catch (error) {
-      console.error("Error updating review:", error);
-      toast.error("Error updating review");
+      toast.error(error.response?.data?.message || "Failed to update review");
     }
   };
 
   const handleDeleteReview = async (reviewId) => {
     try {
-      const response = await fetch(
+      const response = await axios.delete(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews/${reviewId}`,
         {
-          method: "DELETE",
           headers: {
+            Authorization: `Bearer ${localStorage.getItem("Token")}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            userId: authUser._id,
-          }),
+          data: { userId: authUser._id },
         }
       );
 
-      if (response.ok) {
+      if (response.data) {
         toast.success("Review deleted successfully");
         fetchBook();
-      } else {
-        toast.error("Failed to delete review");
       }
     } catch (error) {
-      console.error("Error deleting review:", error);
-      toast.error("Error deleting review");
+      toast.error(error.response?.data?.message || "Failed to delete review");
     }
   };
 
@@ -158,8 +147,12 @@ function Buy() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Book not found</h2>
-          <p className="text-gray-600 dark:text-gray-400">The book you're looking for doesn't exist.</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+            Book not found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            The book you're looking for doesn't exist.
+          </p>
         </div>
       </div>
     );
@@ -181,7 +174,9 @@ function Buy() {
 
           {/* Book Info */}
           <div className="md:w-2/3 p-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{book.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              {book.name}
+            </h1>
             <div className="flex items-center mb-4">
               <div className="flex items-center">
                 {[...Array(5)].map((_, index) => (
@@ -202,7 +197,9 @@ function Buy() {
             <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               ${book.price}
             </p>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">{book.title}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {book.title}
+            </p>
 
             {/* Quantity Selector */}
             <div className="flex items-center space-x-4 mb-6">
@@ -234,11 +231,16 @@ function Buy() {
 
       {/* Reviews Section */}
       <div className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Customer Reviews</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Customer Reviews
+        </h2>
 
         {/* Review Form */}
         {authUser && (
-          <form onSubmit={handleSubmitReview} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+          <form
+            onSubmit={handleSubmitReview}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8"
+          >
             <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
                 Your Rating
@@ -316,7 +318,9 @@ function Buy() {
                   {authUser && authUser._id === reviewItem.userId && (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEditReview(reviewItem._id, reviewItem)}
+                        onClick={() =>
+                          handleEditReview(reviewItem._id, reviewItem)
+                        }
                         className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
                       >
                         <FaEdit />
@@ -330,12 +334,16 @@ function Buy() {
                     </div>
                   )}
                 </div>
-                <p className="mt-4 text-gray-700 dark:text-gray-300">{reviewItem.review}</p>
+                <p className="mt-4 text-gray-700 dark:text-gray-300">
+                  {reviewItem.review}
+                </p>
               </div>
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">No reviews yet. Be the first to review!</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                No reviews yet. Be the first to review!
+              </p>
             </div>
           )}
         </div>

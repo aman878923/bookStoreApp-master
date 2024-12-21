@@ -53,10 +53,10 @@ export const searchBooks = async (req, res) => {
 
 export const addReview = async (req, res) => {
   try {
-    const { bookId } = req.params;
+    const { id } = req.params;
     const { userId, username, rating, review } = req.body;
 
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
@@ -66,6 +66,7 @@ export const addReview = async (req, res) => {
       username,
       rating,
       review,
+      createdAt: new Date(),
     };
 
     book.reviews.push(newReview);
@@ -81,10 +82,10 @@ export const addReview = async (req, res) => {
 
 export const updateReview = async (req, res) => {
   try {
-    const { bookId, reviewId } = req.params;
+    const { id, reviewId } = req.params;
     const { rating, review, userId } = req.body;
 
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
@@ -114,10 +115,10 @@ export const updateReview = async (req, res) => {
 
 export const deleteReview = async (req, res) => {
   try {
-    const { bookId, reviewId } = req.params;
+    const { id, reviewId } = req.params;
     const { userId } = req.body;
 
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
