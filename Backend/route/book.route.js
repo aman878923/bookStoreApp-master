@@ -11,12 +11,14 @@ import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// Public routes first
 router.get("/", getBook);
 router.get("/search", searchBooks);
-
-router.post("/:id/reviews", authenticateJWT, addReview); // Protected route
-router.put("/:id/reviews/:reviewId", authenticateJWT, updateReview); // Protected route
-router.delete("/:id/reviews/:reviewId", authenticateJWT, deleteReview); // Protected route
 router.get("/:id", getBookById);
+
+// Protected review routes
+router.post("/:id/reviews", authenticateJWT, addReview);
+router.put("/:id/reviews/:reviewId", authenticateJWT, updateReview);
+router.delete("/:id/reviews/:reviewId", authenticateJWT, deleteReview);
 
 export default router;
