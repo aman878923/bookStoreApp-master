@@ -51,6 +51,7 @@ function Buy() {
     }
 
     try {
+      const token = localStorage.getItem("Token");
       const response = await axios.post(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews`,
         {
@@ -61,7 +62,7 @@ function Buy() {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("Token")}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -74,7 +75,7 @@ function Buy() {
         fetchBook();
       }
     } catch (error) {
-      console.log(error.response);
+      console.log("Review submission error:", error);
       toast.error(error.response?.data?.message || "Failed to submit review");
     }
   };
