@@ -70,9 +70,12 @@ export const signup = async (req, res) => {
 
     await newUser.save();
 
-    // Generate JWT token
-    const token = generateToken({ id: newUser._id, email: newUser.email });
-
+      // Generate JWT token
+      const token = generateToken({ 
+        id: newUser._id, 
+        email: newUser.email,
+        fullname: newUser.fullname 
+      });
     // After successful user creation, send welcome email
     const mailOptions = {
       from: process.env.EMAIL_USER,
