@@ -14,24 +14,27 @@ const ContactInfo = ({ icon: Icon, title, content }) => (
       <Icon className="w-6 h-6 text-pink-500" />
     </div>
     <div>
-      <h3 className="font-medium text-gray-900 dark:text-white mb-1">{title}</h3>
+      <h3 className="font-medium text-gray-900 dark:text-white mb-1">
+        {title}
+      </h3>
       <p className="text-gray-600 dark:text-gray-300">{content}</p>
     </div>
   </motion.div>
 );
 
-const InputField = ({ label, error, ...props }) => (
+const InputField = React.forwardRef(({ label, error, ...props }, ref) => (
   <div>
     <label className="block text-gray-700 dark:text-gray-200 font-medium mb-2">
       {label}
     </label>
     <input
+      ref={ref}
       className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-slate-700 dark:text-white transition-colors"
       {...props}
     />
     {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
   </div>
-);
+));
 
 function Contact() {
   const {
@@ -43,14 +46,26 @@ function Contact() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post(
+      const response = await axios.post(
         "https://bookstoreapp-master.onrender.com/contact",
-        data
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
-      toast.success("Message sent successfully! We'll get back to you soon.");
-      reset();
+
+      if (response.data) {
+        toast.success("Message sent successfully! We'll get back to you soon.");
+        reset();
+      }
     } catch (error) {
-      toast.error("Failed to send message. Please try again.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to send message. Please try again."
+      );
+      console.log("Contact Form Error:", error);
     }
   };
 
@@ -134,7 +149,9 @@ function Contact() {
                   </label>
                   <select
                     className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-slate-700 dark:text-white transition-colors"
-                    {...register("subject", { required: "Please select a subject" })}
+                    {...register("subject", {
+                      required: "Please select a subject",
+                    })}
                   >
                     <option value="">Select a subject</option>
                     <option value="order">Order Inquiry</option>
@@ -165,7 +182,9 @@ function Contact() {
                     className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-slate-700 dark:text-white transition-colors"
                     rows="4"
                     placeholder="How can we help you?"
-                    {...register("message", { required: "Message is required" })}
+                    {...register("message", {
+                      required: "Message is required",
+                    })}
                   ></textarea>
                   {errors.message && (
                     <span className="text-red-500 text-sm mt-1">

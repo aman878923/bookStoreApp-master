@@ -2,6 +2,8 @@ import User from "../model/user.model.js";
 import bcryptjs from "bcryptjs";
 import PasswordValidator from "password-validator";
 import { generateToken } from "../utils/jwt.js";
+import { getWelcomeEmailTemplate } from "../utils/emailTemplates.js";
+import { transporter } from "../config/nodemailer.js";
 
 // Create password validation schema
 const schema = new PasswordValidator();
@@ -36,7 +38,6 @@ const getPasswordErrorMessage = (validationResult) => {
     (error) => errorMessages[error.validation] || error.message
   );
 };
-
 export const signup = async (req, res) => {
   try {
     const { fullname, email, password } = req.body;
@@ -70,21 +71,31 @@ export const signup = async (req, res) => {
     // Generate JWT token
     const token = generateToken({ id: newUser._id, email: newUser.email });
 
+    // After successful user creation, send welcome email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Welcome to BookStore - Your Reading Journey Begins!",
+      html: getWelcomeEmailTemplate(fullname),
+    };
+
+    await transporter.sendMail(mailOptions);
+
     res.status(201).json({
-      message: "Registration successful! Please login.",
+      success: true,
+      message: "Signup successful! Welcome email sent.",
+      token,
       user: {
-        _id: newUser._id,
+        id: newUser._id,
         fullname: newUser.fullname,
         email: newUser.email,
       },
-      token,
     });
   } catch (error) {
-    console.log("Error in signup:", error.message);
-    res.status(500).json({ message: "Registration failed. Please try again." });
+    console.error("Signup error:", error);
+    res.status(500).json({ message: "Error during signup process" });
   }
 };
-
 // import { generateToken } from "../utils/jwt.js";
 
 export const login = async (req, res) => {
