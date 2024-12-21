@@ -70,12 +70,13 @@ export const signup = async (req, res) => {
 
     await newUser.save();
 
-      // Generate JWT token
-      const token = generateToken({ 
-        id: newUser._id, 
-        email: newUser.email,
-        fullname: newUser.fullname 
-      });
+    // Generate JWT token
+    const token = generateToken({ 
+      id: newUser._id, 
+      email: newUser.email,
+      fullname: newUser.fullname 
+    });
+
     // After successful user creation, send welcome email
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -101,6 +102,7 @@ export const signup = async (req, res) => {
     res.status(500).json({ message: "Error during signup process" });
   }
 };
+
 // import { generateToken } from "../utils/jwt.js";
 
 export const login = async (req, res) => {
