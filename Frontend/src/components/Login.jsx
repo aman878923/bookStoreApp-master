@@ -17,7 +17,7 @@ function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const onSubmit = async (data) => {
@@ -36,12 +36,12 @@ function Login() {
         localStorage.setItem("Users", JSON.stringify(userData));
         setAuthUser(userData);
         toast.success("Welcome back! ");
-        
+
         const modal = document.getElementById("my_modal_3");
         if (modal) {
           modal.close();
         }
-        
+
         navigate(from, { replace: true });
       }
     } catch (err) {
@@ -63,11 +63,13 @@ function Login() {
           <h3 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
             Welcome Back
           </h3>
+          
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Don't have an account yet?{" "}
             <button
               onClick={() => {
                 document.getElementById("my_modal_3").close();
+                navigate("/signup"); // Add navigation to signup page
               }}
               className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300"
             >
@@ -87,7 +89,9 @@ function Login() {
                 type="email"
                 placeholder="you@example.com"
                 className={`block w-full px-4 py-3 rounded-lg border ${
-                  errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  errors.email
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
                 } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
                 {...register("email", {
                   required: "Email is required",
@@ -99,8 +103,16 @@ function Login() {
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-500 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   {errors.email.message}
                 </p>
@@ -118,7 +130,9 @@ function Login() {
                 type="password"
                 placeholder="••••••••"
                 className={`block w-full px-4 py-3 rounded-lg border ${
-                  errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  errors.password
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
                 } focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300`}
                 {...register("password", {
                   required: "Password is required",
@@ -126,8 +140,16 @@ function Login() {
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-red-500 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   {errors.password.message}
                 </p>
