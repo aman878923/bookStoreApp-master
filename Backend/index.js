@@ -36,19 +36,27 @@ mongoose
     console.log("❌ MongoDB connection error:", error);
     process.exit(1);
   });
-  app.use(
-    morgan(function (tokens, req, res) {
-      return [
-        tokens.method(req, res),
-        tokens.url(req, res),
-        tokens.status(req, res),
-        tokens.res(req, res, "content-length"),
-        "-",
-        tokens["response-time"](req, res),
-        "ms",
-      ].join(" ");
-    })
-  );
+app.use(
+  morgan(function (tokens, req, res) {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, "content-length"),
+      "-",
+      tokens["response-time"](req, res),
+      "ms",
+    ].join(" ");
+  })
+);
+app.use((req, res, next) => {
+  console.log("Request received:", {
+    method: req.method,
+    path: req.path,
+    body: req.body,
+  });
+  next();
+});
 
 app.use("/book", bookRoute);
 app.use("/user", userRoute);

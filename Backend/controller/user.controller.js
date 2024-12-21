@@ -39,10 +39,12 @@ const getPasswordErrorMessage = (validationResult) => {
   );
 };
 export const signup = async (req, res) => {
+  console.log('Signup request received:', req.body);
   try {
     const { fullname, email, password } = req.body;
 
     if (!fullname || !email || !password) {
+      console.log('Missing required fields:', { fullname, email, password });
       return res.status(400).json({ message: "All fields are required" });
     }
 
