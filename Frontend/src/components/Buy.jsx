@@ -78,7 +78,7 @@ function Buy() {
       }
     } catch (error) {
       console.log("Review submission error:", error);
-      toast.error(error.response?.data?.message || "Failed to submit review");
+      toast.error("Failed to submit review. Please try again.");
     }
   };
 

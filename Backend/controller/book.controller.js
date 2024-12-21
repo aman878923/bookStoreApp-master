@@ -56,6 +56,8 @@ export const addReview = async (req, res) => {
     const { id } = req.params;
     const { userId, username, rating, review } = req.body;
 
+    console.log("Adding review:", { id, userId, username, rating, review });
+
     const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
@@ -64,19 +66,25 @@ export const addReview = async (req, res) => {
     const newReview = {
       userId,
       username,
-      rating,
+      rating: Number(rating),
       review,
       createdAt: new Date(),
     };
 
     book.reviews.push(newReview);
-    await book.save();
+    const updatedBook = await book.save();
 
-    res.status(201).json({ message: "Review added successfully", book });
+    res.status(201).json({
+      success: true,
+      message: "Review added successfully",
+      book: updatedBook,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error adding review", error: error.message });
+    console.error("Add review error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding review",
+    });
   }
 };
 
