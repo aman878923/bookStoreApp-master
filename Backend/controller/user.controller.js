@@ -85,7 +85,7 @@ export const signup = async (req, res) => {
   }
 };
 
-import { generateToken } from "../utils/jwt.js";
+// import { generateToken } from "../utils/jwt.js";
 
 export const login = async (req, res) => {
   try {
