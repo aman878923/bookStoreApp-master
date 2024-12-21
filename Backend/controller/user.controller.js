@@ -1,18 +1,26 @@
 import User from "../model/user.model.js";
 import bcryptjs from "bcryptjs";
-import PasswordValidator from 'password-validator';
-import { generateToken } from '../utils/jwt.js';
+import PasswordValidator from "password-validator";
+import { generateToken } from "../utils/jwt.js";
 
 // Create password validation schema
 const schema = new PasswordValidator();
 schema
-  .is().min(8)
-  .is().max(100)
-  .has().uppercase()
-  .has().lowercase()
-  .has().digits(2)
-  .has().symbols(1)
-  .has().not().spaces();
+  .is()
+  .min(8)
+  .is()
+  .max(100)
+  .has()
+  .uppercase()
+  .has()
+  .lowercase()
+  .has()
+  .digits(2)
+  .has()
+  .symbols(1)
+  .has()
+  .not()
+  .spaces();
 
 const getPasswordErrorMessage = (validationResult) => {
   const errorMessages = {
@@ -22,9 +30,11 @@ const getPasswordErrorMessage = (validationResult) => {
     lowercase: "Password must contain at least one lowercase letter",
     digits: "Password must contain at least 2 numbers",
     symbols: "Password must contain at least 1 special character",
-    spaces: "Password cannot contain spaces"
+    spaces: "Password cannot contain spaces",
   };
-  return validationResult.map(error => errorMessages[error.validation] || error.message);
+  return validationResult.map(
+    (error) => errorMessages[error.validation] || error.message
+  );
 };
 
 export const signup = async (req, res) => {
@@ -39,7 +49,7 @@ export const signup = async (req, res) => {
     if (validationResult.length > 0) {
       return res.status(400).json({
         message: "Please check password requirements:",
-        errors: getPasswordErrorMessage(validationResult)
+        errors: getPasswordErrorMessage(validationResult),
       });
     }
 
@@ -67,7 +77,7 @@ export const signup = async (req, res) => {
         fullname: newUser.fullname,
         email: newUser.email,
       },
-      token
+      token,
     });
   } catch (error) {
     console.log("Error in signup:", error.message);
@@ -75,38 +85,29 @@ export const signup = async (req, res) => {
   }
 };
 
+import { generateToken } from "../utils/jwt.js";
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
-
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+
+    if (!user || !(await bcryptjs.compare(password, user.password))) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    // Generate JWT token
-    const token = generateToken({ id: user._id, email: user.email });
+    const token = generateToken(user);
 
     res.status(200).json({
-      message: "Login successful!",
+      success: true,
+      token,
       user: {
-        _id: user._id,
-        fullname: user.fullname,
+        id: user._id,
         email: user.email,
+        fullname: user.fullname,
       },
-      token
     });
   } catch (error) {
-    console.log("Error in login:", error.message);
-    res.status(500).json({ message: "Login failed. Please try again." });
+    res.status(500).json({ message: "Login failed" });
   }
 };
