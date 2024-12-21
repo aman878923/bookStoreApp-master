@@ -74,6 +74,7 @@ function Buy() {
         fetchBook();
       }
     } catch (error) {
+      console.log(error.response);
       toast.error(error.response?.data?.message || "Failed to submit review");
     }
   };
