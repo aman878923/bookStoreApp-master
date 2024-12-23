@@ -129,7 +129,11 @@ export const login = async (req, res) => {
         fullname: user.fullname,
         email: user.email,
       },
+      
     });
+    localStorage.setItem("Token", token);
+    localStorage.setItem("Users", JSON.stringify(user));
+    console.log('Stored token:', localStorage.getItem("Token"));
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Server error" });
