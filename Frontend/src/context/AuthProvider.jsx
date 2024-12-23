@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 
 export const AuthContext = createContext();
 
@@ -10,12 +10,17 @@ export default function AuthProvider({ children }) {
   );
 
   const handleLogin = async (loginData) => {
+    console.log('Login attempt:', loginData);
     const response = await axios.post('https://bookstoreapp-master.onrender.com/user/login', loginData);
+    console.log('Server response:', response.data);
+    
     const { token, user } = response.data;
     localStorage.setItem("Token", token);
     localStorage.setItem("Users", JSON.stringify(user));
+    console.log('Stored token:', localStorage.getItem("Token"));
+    
     setAuthUser(user);
-  };
+};
 
   return (
     <AuthContext.Provider value={[authUser, setAuthUser, handleLogin]}>
@@ -23,4 +28,5 @@ export default function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
 export const useAuth = () => useContext(AuthContext);
