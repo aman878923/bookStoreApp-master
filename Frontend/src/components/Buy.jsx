@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
 import {
   FaStar,
   FaShoppingCart,
@@ -21,7 +20,8 @@ function Buy() {
   const [editingReview, setEditingReview] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
-  const [authUser] = useAuth();
+  const navigate = useNavigate();
+  const [authUser, setAuthUser, handleLogin] = useAuth();
 
   const fetchBook = useCallback(async () => {
     try {
@@ -52,8 +52,13 @@ function Buy() {
       return;
     }
 
+    const token = localStorage.getItem("Token");
+    if (!token) {
+      toast.error("Authentication token not found. Please login again.");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("Token");
       const response = await axios.post(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews`,
         {
@@ -70,15 +75,15 @@ function Buy() {
         }
       );
 
-      if (response.data) {
+      if (response.data.success) {
         toast.success("Review submitted successfully");
         setReview("");
         setRating(5);
         fetchBook();
       }
     } catch (error) {
-      console.log("Review submission error:", error);
-      toast.error("Failed to submit review. Please try again.");
+      toast.error(error.response?.data?.message || "Failed to submit review");
+      console.error("Review submission error:", error);
     }
   };
 
