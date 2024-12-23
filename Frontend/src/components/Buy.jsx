@@ -47,14 +47,17 @@ function Buy() {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("Token");
+
     if (!authUser) {
       toast.error("Please login to submit a review");
+      navigate("/login");
       return;
     }
 
-    const token = localStorage.getItem("Token");
     if (!token) {
-      toast.error("Authentication token not found. Please login again.");
+      toast.error("Session expired. Please login again");
+      navigate("/login");
       return;
     }
 
@@ -75,15 +78,15 @@ function Buy() {
         }
       );
 
-      if (response.data.success) {
+      if (response.data) {
         toast.success("Review submitted successfully");
         setReview("");
         setRating(5);
         fetchBook();
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to submit review");
       console.error("Review submission error:", error);
+      toast.error("Failed to submit review. Please try again.");
     }
   };
 

@@ -39,12 +39,12 @@ const getPasswordErrorMessage = (validationResult) => {
   );
 };
 export const signup = async (req, res) => {
-  console.log('Signup request received:', req.body);
+  console.log("Signup request received:", req.body);
   try {
     const { fullname, email, password } = req.body;
 
     if (!fullname || !email || !password) {
-      console.log('Missing required fields:', { fullname, email, password });
+      console.log("Missing required fields:", { fullname, email, password });
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -71,10 +71,10 @@ export const signup = async (req, res) => {
     await newUser.save();
 
     // Generate JWT token
-    const token = generateToken({ 
-      id: newUser._id, 
+    const token = generateToken({
+      id: newUser._id,
       email: newUser.email,
-      fullname: newUser.fullname 
+      fullname: newUser.fullname,
     });
 
     // After successful user creation, send welcome email
@@ -110,22 +110,28 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
-    if (!user || !(await bcryptjs.compare(password, user.password))) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const token = generateToken(user);
+    console.log("Generated token:", token); // Track token generation
 
     res.status(200).json({
-      success: true,
       token,
       user: {
-        id: user._id,
-        email: user.email,
+        _id: user._id,
         fullname: user.fullname,
+        email: user.email,
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Login failed" });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
