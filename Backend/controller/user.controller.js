@@ -131,8 +131,12 @@ export const login = async (req, res) => {
       },
       
     });
-    localStorage.setItem("Token", token);
-    localStorage.setItem("Users", JSON.stringify(user));
+    if (typeof window !== 'undefined') {
+      // This code will only run in the browser
+      localStorage.setItem("Token", token);
+      localStorage.setItem("Users", JSON.stringify(user));
+    }
+    
     console.log('Stored token:', localStorage.getItem("Token"));
   } catch (error) {
     console.error("Login error:", error);
