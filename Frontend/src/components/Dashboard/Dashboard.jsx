@@ -4,10 +4,25 @@ import Sidebar from "./Sidebar";
 import Profile from "./Profile";
 import Orders from "./Orders";
 import Settings from "./Settings";
-
+import { useEffect } from "react";
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("profile");
   const { authUser } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (authUser) {
+      setLoading(false);
+    }
+  }, [authUser]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-pink-500"></div>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -56,5 +71,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;

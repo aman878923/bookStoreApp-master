@@ -2,9 +2,10 @@ import React from 'react';
 import { FaUser, FaShoppingBag, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Sidebar = ({ activeSection, setActiveSection }) => {
-  const [, setAuthUser] = useAuth();
+  const { authUser, setAuthUser } = useAuth();
   const navigate = useNavigate();
 
   const menuItems = [
@@ -14,13 +15,15 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('Token');
+    localStorage.removeItem('Users');
     setAuthUser(null);
+    toast.success('Logged out successfully');
     navigate('/');
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg">
       {menuItems.map((item) => (
         <button
           key={item.id}

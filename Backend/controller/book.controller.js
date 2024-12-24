@@ -91,7 +91,7 @@ export const addReview = async (req, res) => {
 export const updateReview = async (req, res) => {
   try {
     const { id, reviewId } = req.params;
-    const { rating, review, userId } = req.body;
+    const { userId, username, rating, review } = req.body;
 
     const book = await Book.findById(id);
     if (!book) {
@@ -104,22 +104,22 @@ export const updateReview = async (req, res) => {
     }
 
     if (reviewToUpdate.userId.toString() !== userId) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to update this review" });
+      return res.status(403).json({ message: "Unauthorized to update this review" });
     }
 
     reviewToUpdate.rating = rating;
     reviewToUpdate.review = review;
+    reviewToUpdate.username = username;
+    
     await book.save();
 
     res.status(200).json({ message: "Review updated successfully", book });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating review", error: error.message });
+    console.error("Update review error:", error);
+    res.status(500).json({ message: "Error updating review", error: error.message });
   }
 };
+
 
 export const deleteReview = async (req, res) => {
   try {

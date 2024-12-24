@@ -37,8 +37,14 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/search" element={<SearchResults />} />
           <Route
-            path="/dashboard"
-            element={authUser ? <Dashboard /> : <Navigate to="/signup" />}
+            path="/dashboard/*"
+            element={
+              authUser ? (
+                <Dashboard />
+              ) : (
+                <Navigate to="/signup" state={{ from: location }} />
+              )
+            }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

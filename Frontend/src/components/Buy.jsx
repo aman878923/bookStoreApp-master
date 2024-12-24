@@ -84,16 +84,19 @@ function Buy() {
 
   const handleEditReview = async (reviewId) => {
     try {
+      const token = localStorage.getItem("Token");
       const response = await axios.put(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews/${reviewId}`,
         {
           userId: authUser._id,
+          username: authUser.fullname,
           rating,
           review,
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("Token")}`,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
@@ -103,9 +106,10 @@ function Buy() {
         setEditingReview(null);
         setReview("");
         setRating(5);
-        fetchBook();
+        await fetchBook();
       }
     } catch (error) {
+      console.error("Edit review error:", error);
       toast.error("Failed to update review");
     }
   };
