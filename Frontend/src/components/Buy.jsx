@@ -41,6 +41,11 @@ function Buy() {
   useEffect(() => {
     fetchBook();
   }, [fetchBook]);
+  const handleEditClick = (reviewItem) => {
+    setEditingReview(reviewItem._id);
+    setReview(reviewItem.review);
+    setRating(reviewItem.rating);
+  };
 
   const calculateAverageRating = () => {
     if (!book?.reviews?.length) return 0;
@@ -89,7 +94,6 @@ function Buy() {
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews/${reviewId}`,
         {
           userId: authUser._id,
-          username: authUser.fullname,
           rating,
           review,
         },
@@ -226,12 +230,17 @@ function Buy() {
 
         {authUser && (
           <form
-            onSubmit={handleSubmitReview}
+            onSubmit={(e) => {
+              e.preventDefault();
+              editingReview
+                ? handleEditReview(editingReview)
+                : handleSubmitReview(e);
+            }}
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8"
           >
             <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
-                Your Rating
+                {editingReview ? "Edit Rating" : "Your Rating"}
               </label>
               <div className="flex space-x-2">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -252,7 +261,7 @@ function Buy() {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
-                Your Review
+                {editingReview ? "Edit Review" : "Your Review"}
               </label>
               <textarea
                 value={review}
@@ -263,12 +272,27 @@ function Buy() {
                 required
               ></textarea>
             </div>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow transition-all duration-300"
-            >
-              Submit Review
-            </button>
+            <div className="flex space-x-4">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow transition-all duration-300"
+              >
+                {editingReview ? "Update Review" : "Submit Review"}
+              </button>
+              {editingReview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingReview(null);
+                    setReview("");
+                    setRating(5);
+                  }}
+                  className="px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg shadow transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         )}
 
@@ -305,7 +329,7 @@ function Buy() {
                   {authUser && authUser._id === reviewItem.userId && (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEditReview(reviewItem._id)}
+                        onClick={() => handleEditClick(reviewItem)}
                         className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800"
                       >
                         <FaEdit />
