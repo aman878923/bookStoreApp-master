@@ -109,7 +109,6 @@ export const updateReview = async (req, res) => {
 
     reviewToUpdate.rating = rating;
     reviewToUpdate.review = review;
-    reviewToUpdate.username = username;
     
     await book.save();
 
