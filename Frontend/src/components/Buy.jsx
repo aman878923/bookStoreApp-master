@@ -21,16 +21,15 @@ function Buy() {
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [authUser, setAuthUser, handleLogin] = useAuth();
+  const { authUser } = useAuth();
 
   const fetchBook = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(
+      const response = await axios.get(
         `https://bookstoreapp-master.onrender.com/book/${id}`
       );
-      const data = await response.json();
-      setBook(data);
+      setBook(response.data);
     } catch (error) {
       console.error("Error fetching book:", error);
       toast.error("Failed to load book details");
@@ -40,28 +39,25 @@ function Buy() {
   }, [id]);
 
   useEffect(() => {
-    if (id) {
-      fetchBook();
-    }
-  }, [id, fetchBook]);
+    fetchBook();
+  }, [fetchBook]);
+
+  const calculateAverageRating = () => {
+    if (!book?.reviews?.length) return 0;
+    const sum = book.reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / book.reviews.length).toFixed(1);
+  };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("Token");
-
     if (!authUser) {
       toast.error("Please login to submit a review");
       navigate("/login");
       return;
     }
 
-    if (!token) {
-      toast.error("Session expired. Please login again");
-      navigate("/login");
-      return;
-    }
-
     try {
+      const token = localStorage.getItem("Token");
       const response = await axios.post(
         `https://bookstoreapp-master.onrender.com/book/${id}/reviews`,
         {
@@ -71,10 +67,7 @@ function Buy() {
           review,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -85,8 +78,7 @@ function Buy() {
         fetchBook();
       }
     } catch (error) {
-      console.error("Review submission error:", error);
-      toast.error("Failed to submit review. Please try again.");
+      toast.error("Failed to submit review");
     }
   };
 
@@ -102,7 +94,6 @@ function Buy() {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("Token")}`,
-            "Content-Type": "application/json",
           },
         }
       );
@@ -115,7 +106,7 @@ function Buy() {
         fetchBook();
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update review");
+      toast.error("Failed to update review");
     }
   };
 
@@ -126,7 +117,6 @@ function Buy() {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("Token")}`,
-            "Content-Type": "application/json",
           },
           data: { userId: authUser._id },
         }
@@ -137,14 +127,8 @@ function Buy() {
         fetchBook();
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete review");
+      toast.error("Failed to delete review");
     }
-  };
-
-  const calculateAverageRating = () => {
-    if (!book?.reviews?.length) return 0;
-    const sum = book.reviews.reduce((acc, review) => acc + review.rating, 0);
-    return (sum / book.reviews.length).toFixed(1);
   };
 
   if (loading) {
@@ -162,9 +146,6 @@ function Buy() {
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
             Book not found
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            The book you're looking for doesn't exist.
-          </p>
         </div>
       </div>
     );
@@ -172,10 +153,8 @@ function Buy() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Book Details Section */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
         <div className="md:flex">
-          {/* Book Image */}
           <div className="md:w-1/3 p-8">
             <img
               src={book.image}
@@ -183,8 +162,6 @@ function Buy() {
               className="w-full h-auto rounded-lg shadow-lg object-cover"
             />
           </div>
-
-          {/* Book Info */}
           <div className="md:w-2/3 p-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               {book.name}
@@ -212,8 +189,6 @@ function Buy() {
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {book.title}
             </p>
-
-            {/* Quantity Selector */}
             <div className="flex items-center space-x-4 mb-6">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -231,8 +206,6 @@ function Buy() {
                 <FaPlus className="text-gray-600 dark:text-gray-400" />
               </button>
             </div>
-
-            {/* Add to Cart Button */}
             <button className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg flex items-center justify-center space-x-2 transition-all duration-300">
               <FaShoppingCart />
               <span>Add to Cart</span>
@@ -247,7 +220,6 @@ function Buy() {
           Customer Reviews
         </h2>
 
-        {/* Review Form */}
         {authUser && (
           <form
             onSubmit={handleSubmitReview}
@@ -296,13 +268,12 @@ function Buy() {
           </form>
         )}
 
-        {/* Reviews List */}
         <div className="space-y-6">
           {book.reviews && book.reviews.length > 0 ? (
             book.reviews.map((reviewItem) => (
               <div
                 key={reviewItem._id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -330,16 +301,14 @@ function Buy() {
                   {authUser && authUser._id === reviewItem.userId && (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() =>
-                          handleEditReview(reviewItem._id, reviewItem)
-                        }
-                        className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                        onClick={() => handleEditReview(reviewItem._id)}
+                        className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800"
                       >
                         <FaEdit />
                       </button>
                       <button
                         onClick={() => handleDeleteReview(reviewItem._id)}
-                        className="p-2 rounded-lg bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                        className="p-2 rounded-lg bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800"
                       >
                         <FaTrash />
                       </button>
