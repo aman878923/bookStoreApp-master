@@ -6,11 +6,11 @@ import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthProvider";
 
 function Login() {
+  const { handleLogin } = useAuth();  // Use object destructuring
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-  const [, setAuthUser] = useAuth();
 
   const {
     register,
@@ -23,37 +23,28 @@ function Login() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const response = await axios.post(
-        "https://bookstoreapp-master.onrender.com/user/login",
-        {
-          email: data.email,
-          password: data.password,
-        }
-      );
-
-      if (response.data) {
-        const userData = response.data.user;
-        localStorage.setItem("Users", JSON.stringify(userData));
-        setAuthUser(userData);
-        toast.success("Welcome back! ");
-
+      const result = await handleLogin({
+        email: data.email,
+        password: data.password,
+      });
+  
+      if (result.success) {
+        toast.success("Welcome back!");
         const modal = document.getElementById("my_modal_3");
         if (modal) {
           modal.close();
         }
-
         navigate(from, { replace: true });
-      }
-    } catch (err) {
-      if (err.response?.data?.message) {
-        toast.error(err.response.data.message);
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error(result.error);
       }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <dialog id="my_modal_3" className="modal">

@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 import axios from "axios";
 import SearchResults from "./SearchResults";
 import { Link, useNavigate } from "react-router-dom";
-import { FaSearch, FaBars, FaSun, FaMoon, FaUser } from 'react-icons/fa';
+import { FaSearch, FaBars, FaSun, FaMoon, FaUser } from "react-icons/fa";
 
 const SearchBar = ({ searchTerm, onSearch, onSearchClick }) => (
   <div className="relative flex items-center">
@@ -29,7 +29,7 @@ const SearchBar = ({ searchTerm, onSearch, onSearchClick }) => (
 
 function Navbar() {
   const navigate = useNavigate();
-  const [authUser] = useAuth();
+  const { authUser } = useAuth();
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
@@ -50,10 +50,10 @@ function Navbar() {
             searchTerm
           )}`
         );
-        navigate('/search', { state: { results: response.data, searchTerm } });
+        navigate("/search", { state: { results: response.data, searchTerm } });
       } catch (error) {
         console.error("Search error:", error);
-        navigate('/search', { state: { results: [], searchTerm } });
+        navigate("/search", { state: { results: [], searchTerm } });
       }
     }
   };
@@ -147,7 +147,9 @@ function Navbar() {
                 <Logout />
               ) : (
                 <button
-                  onClick={() => document.getElementById("my_modal_3").showModal()}
+                  onClick={() =>
+                    document.getElementById("my_modal_3").showModal()
+                  }
                   className="flex items-center space-x-2 px-4 py-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors"
                 >
                   <FaUser className="h-4 w-4" />

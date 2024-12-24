@@ -7,14 +7,14 @@ import Signup from "./components/Signup";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Buy from "./components/Buy";
-import { useAuth } from "./context/AuthProvider";
+import { AuthProvider, useAuth } from "./context/AuthProvider.jsx";
 import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import SearchResults from "./components/SearchResults";
 
 function App() {
-  const [authUser] = useAuth();
+  const { authUser } = useAuth();
 
   return (
     <div className="min-h-screen dark:bg-slate-900 dark:text-white">

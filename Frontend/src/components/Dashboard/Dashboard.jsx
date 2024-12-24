@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthProvider';
-import Sidebar from './Sidebar';
-import Profile from './Profile';
-import Orders from './Orders';
-import Settings from './Settings';
+import React, { useState } from "react";
+import { useAuth } from "../../context/AuthProvider";
+import Sidebar from "./Sidebar";
+import Profile from "./Profile";
+import Orders from "./Orders";
+import Settings from "./Settings";
 
 const Dashboard = () => {
-  const [activeSection, setActiveSection] = useState('profile');
-  const [authUser] = useAuth();
+  const [activeSection, setActiveSection] = useState("profile");
+  const { authUser } = useAuth();
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'profile':
+      case "profile":
         return <Profile user={authUser} />;
-      case 'orders':
+      case "orders":
         return <Orders />;
-      case 'settings':
+      case "settings":
         return <Settings />;
       default:
         return <Profile user={authUser} />;
@@ -28,12 +28,12 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar */}
           <div className="md:w-1/4">
-            <Sidebar 
-              activeSection={activeSection} 
+            <Sidebar
+              activeSection={activeSection}
               setActiveSection={setActiveSection}
             />
           </div>
-          
+
           {/* Main Content */}
           <div className="md:w-3/4">
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
