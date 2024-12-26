@@ -99,7 +99,7 @@ function Buy() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("Token")}`,
             "Content-Type": "application/json",
           },
         }
