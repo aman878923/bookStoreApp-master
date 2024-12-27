@@ -9,6 +9,9 @@ import userRoute from "./route/user.route.js";
 import seedFreeBooks from "./inti/FreeBooks.js";
 import seedPaidBooks from "./inti/modeData.js";
 import morgan from "morgan";
+import { setupSocket } from "./config/socket.js";
+import chatRoutes from "./route/chat.route.js";
+import http from "http";
 
 const app = express();
 dotenv.config();
@@ -62,6 +65,20 @@ app.use("/book", bookRoute);
 app.use("/user", userRoute);
 app.use("/contact", contactRoute);
 
+app.use("/api/chat", chatRoutes);
+
+// Setup Socket.io
+const server = http.createServer(app);
+const io = setupSocket(server);
+
+// Socket event handlers
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.userId);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.userId);
+  });
+});
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });

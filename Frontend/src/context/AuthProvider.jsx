@@ -50,7 +50,8 @@ export const AuthProvider = ({ children }) => {
     authUser,
     setAuthUser,
     handleLogin,
-    handleLogout
+    handleLogout,
+    token: localStorage.getItem("Token")
   };
 
   return (

@@ -13,6 +13,11 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import SearchResults from "./components/SearchResults";
 
+import ChatInterface from './components/Chat/ChatInterface';
+import ChatButton from "./components/Chat/ChatButton.jsx";
+
+
+
 function App() {
   const { authUser } = useAuth();
 
@@ -36,6 +41,7 @@ function App() {
           <Route path="/buy/:id" element={<Buy />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/search" element={<SearchResults />} />
+         
           <Route
             path="/dashboard/*"
             element={
@@ -48,6 +54,8 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ChatButton></ChatButton>
+       
         <Toaster />
       </div>
     </div>

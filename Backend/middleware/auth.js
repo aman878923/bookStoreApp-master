@@ -5,7 +5,7 @@ export const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log('Auth header:', authHeader);
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!authHeader /* || !authHeader.startsWith("Bearer ") */) {
       return res.status(401).json({
           success: false,
           message: "No token provided"
