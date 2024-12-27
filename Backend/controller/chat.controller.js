@@ -49,7 +49,7 @@ export const sendMessage = async (req, res) => {
         const prompt = generateBookstorePrompt(content);
         const result = await geminiModel.generateContent(prompt);
         const response = await result.response;
-        const aiResponse = response.text();
+        let aiResponse = response.text();
          // Format the AI response
          aiResponse = aiResponse
          .replace(/\n\n/g, '<br/><br/>') // Convert double line breaks to HTML breaks
