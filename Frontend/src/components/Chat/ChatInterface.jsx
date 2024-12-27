@@ -68,7 +68,7 @@ const ChatInterface = ({ onClose }) => {
           .join("\n"),
         sender: "bot",
       };
-      setMessages(prev => [...prev, formattedResponse]);
+      setMessages((prev) => [...prev, formattedResponse]);
       scrollToBottom();
     } catch (error) {
       console.error("Error sending message:", error);
@@ -109,14 +109,18 @@ const ChatInterface = ({ onClose }) => {
             }`}
           >
             <div
-              className={`inline-block p-3 rounded-lg whitespace-pre-wrap ${
+              className={`inline-block p-3 rounded-lg ${
                 msg.sender === "user"
                   ? "bg-primary text-white"
                   : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
               }`}
-            >
-              {msg.content}
-            </div>
+              style={{ whiteSpace: "pre-wrap" }}
+              dangerouslySetInnerHTML={
+                msg.sender === "bot"
+                  ? { __html: msg.content }
+                  : { __html: msg.content }
+              }
+            ></div>
           </div>
         ))}
         <div ref={messagesEndRef} />

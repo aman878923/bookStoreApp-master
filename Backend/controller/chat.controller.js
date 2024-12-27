@@ -50,6 +50,13 @@ export const sendMessage = async (req, res) => {
         const result = await geminiModel.generateContent(prompt);
         const response = await result.response;
         const aiResponse = response.text();
+         // Format the AI response
+         aiResponse = aiResponse
+         .replace(/\n\n/g, '<br/><br/>') // Convert double line breaks to HTML breaks
+         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **text** to bold
+         .replace(/\*(.*?)\*/g, '<em>$1</em>') // Convert *text* to italic
+         .replace(/- (.*)/g, '• $1') // Convert hyphens to bullet points
+         .trim(); // Remove extra whitespace
 
         // Add AI response to session
         session.messages.push({
