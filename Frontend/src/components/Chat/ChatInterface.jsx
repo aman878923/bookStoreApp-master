@@ -20,7 +20,7 @@ const ChatInterface = ({onClose}) => {
 
     const startNewSession = async () => {
         try {
-            const response = await fetch('http://localhost:4001/api/chat/session/start', {
+            const response = await fetch('https://bookstoreapp-master.onrender.com/api/chat/session/start', {
                 method: 'POST',
                 headers: {
                     'Authorization': `${localStorage.getItem("Token")}`,
@@ -45,7 +45,7 @@ const ChatInterface = ({onClose}) => {
         setInput('');
 
         try {
-            const response = await fetch('http://localhost:4001/api/chat/message', {
+            const response = await fetch('https://bookstoreapp-master.onrender.com/api/chat/message', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("Token")}`,
