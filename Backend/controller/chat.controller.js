@@ -50,14 +50,20 @@ export const sendMessage = async (req, res) => {
         const result = await geminiModel.generateContent(prompt);
         const response = await result.response;
         let aiResponse = response.text();
-         // Format the AI response
-         aiResponse = aiResponse
-         .replace(/\n\n/g, '<br/><br/>') // Convert double line breaks to HTML breaks
-         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **text** to bold
-         .replace(/\*(.*?)\*/g, '<em>$1</em>') // Convert *text* to italic
-         .replace(/- (.*)/g, '• $1') // Convert hyphens to bullet points
-         .trim(); // Remove extra whitespace
-
+             // Replace the existing formatting section with this enhanced version
+             aiResponse = aiResponse
+                 .replace(/\n\n/g, '<br/><br/>') // Convert double line breaks to HTML breaks
+                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **text** to bold
+                 .replace(/\*(.*?)\*/g, '<em>$1</em>') // Convert *text* to italic
+                 .replace(/- (.*)/g, '• $1') // Convert hyphens to bullet points
+                 .replace(/#{3} (.*)/g, '<h3>$1</h3>') // Convert ### to h3 headers
+                 .replace(/#{2} (.*)/g, '<h2>$1</h2>') // Convert ## to h2 headers
+                 .replace(/#{1} (.*)/g, '<h1>$1</h1>') // Convert # to h1 headers
+                 .replace(/`(.*?)`/g, '<code>$1</code>') // Convert inline code
+                 .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>') // Convert markdown links
+                 .replace(/\n/g, '<br/>') // Convert single line breaks
+                 .replace(/> (.*)/g, '<blockquote>$1</blockquote>') // Convert blockquotes
+                 .trim(); // Remove extra whitespace
         // Add AI response to session
         session.messages.push({
             content: aiResponse,
