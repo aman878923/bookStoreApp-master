@@ -11,5 +11,5 @@ export const geminiModel = genAI.getGenerativeModel({
 
 export const generateBookstorePrompt = (userMessage) => {
   return `As a bookstore assistant, help with: ${userMessage}. 
-    Consider book recommendations, order inquiries, and general bookstore information. and answer in short `;
+    and help in Consider book recommendations, order inquiries, and general bookstore information if user asks. and answer in short `;
 };
