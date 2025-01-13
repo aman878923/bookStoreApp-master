@@ -1,12 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import toast from "react-hot-toast";
 
 function Cards({ item }) {
   const { addToCart } = useAuth();
 
   const handleAddToCart = () => {
     addToCart(item._id);
+    toast.success("Item added to cart");
   };
 
   return (
