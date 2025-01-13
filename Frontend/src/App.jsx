@@ -7,6 +7,7 @@ import Signup from "./components/Signup";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Buy from "./components/Buy";
+import Cart from "./components/Cart"; // Importing Cart component
 import { AuthProvider, useAuth } from "./context/AuthProvider.jsx";
 import Navbar from "./components/Navbar";
 import Login from "./components/Login";
@@ -15,8 +16,6 @@ import SearchResults from "./components/SearchResults";
 
 import ChatInterface from './components/Chat/ChatInterface';
 import ChatButton from "./components/Chat/ChatButton.jsx";
-
-
 
 function App() {
   const { authUser } = useAuth();
@@ -41,7 +40,7 @@ function App() {
           <Route path="/buy/:id" element={<Buy />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/search" element={<SearchResults />} />
-         
+          <Route path="/cart" element={<Cart />} /> {/* Added Cart route */}
           <Route
             path="/dashboard/*"
             element={
