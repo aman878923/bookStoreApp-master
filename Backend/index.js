@@ -6,6 +6,7 @@ import cors from "cors";
 import bookRoute from "./route/book.route.js";
 import contactRoute from "./route/contact.route.js";
 import userRoute from "./route/user.route.js";
+import cartRoute from "./route/cart.route.js";
 import seedFreeBooks from "./inti/FreeBooks.js";
 import seedPaidBooks from "./inti/modeData.js";
 import morgan from "morgan";
@@ -64,6 +65,7 @@ app.use((req, res, next) => {
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
 app.use("/contact", contactRoute);
+app.use("/cart", cartRoute);
 
 app.use("/api/chat", chatRoutes);
 
