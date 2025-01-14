@@ -55,6 +55,7 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Login /> {/* Add Login component here to ensure it's always rendered */}
         <ChatButton />
         <Toaster />
       </div>

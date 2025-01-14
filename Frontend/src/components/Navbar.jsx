@@ -212,7 +212,7 @@ function Navbar() {
                 className="flex items-center space-x-2 px-4 py-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors"
               >
                 <FaUser className="h-4 w-4" />
-                <span>Login</span>
+                <span >Login</span>
               </button>
             )}
           </div>
