@@ -84,10 +84,12 @@ function Navbar() {
     { to: "/course", label: "Course" },
     { to: "/contact", label: "Contact" },
     { to: "/about", label: "About" },
-    ...(authUser ? [
-      { to: "/cart", label: "Cart" }, // Cart link only for logged-in users
-      { to: "/dashboard", label: "Dashboard" }
-    ] : []),
+    ...(authUser
+      ? [
+          { to: "/cart", label: "Cart" }, // Cart link only for logged-in users
+          { to: "/dashboard", label: "Dashboard" },
+        ]
+      : []),
   ];
 
   return (
@@ -208,7 +210,7 @@ function Navbar() {
                   setIsMenuOpen(false);
                 }}
                 className="flex items-center space-x-2 px-4 py-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors"
-                >
+              >
                 <FaUser className="h-4 w-4" />
                 <span>Login</span>
               </button>

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const Cart = () => {
-  const { authUser, cartItems, addToCart, removeFromCart, clearCart } = useAuth();
+  const { authUser, cartItems, addToCart, removeFromCart, clearCart } =
+    useAuth();
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -16,7 +18,9 @@ const Cart = () => {
 
   const fetchCart = async () => {
     try {
-      const response = await axios.get(`https://bookstoreapp-master.onrender.com/cart/${authUser._id}`);
+      const response = await axios.get(
+        `https://bookstoreapp-master.onrender.com/cart/${authUser._id}`
+      );
       setCart(response.data.items || []);
       calculateTotal(response.data.items || []);
     } catch (error) {
@@ -25,7 +29,10 @@ const Cart = () => {
   };
 
   const calculateTotal = (items) => {
-    const totalPrice = items.reduce((sum, item) => sum + (item.bookId.price * item.quantity), 0);
+    const totalPrice = items.reduce(
+      (sum, item) => sum + item.bookId.price * item.quantity,
+      0
+    );
     setTotal(totalPrice);
   };
 
@@ -71,25 +78,42 @@ const Cart = () => {
       ) : (
         <div className="space-y-4">
           {cart.map((item) => (
-            <div key={item.bookId._id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md dark:bg-slate-800">
+            <div
+              key={item.bookId._id}
+              className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md dark:bg-slate-800"
+            >
               <div className="flex items-center space-x-4">
-                <img src={item.bookId.image} alt={item.bookId.name} className="w-16 h-16 object-cover rounded" />
+                <img
+                  src={item.bookId.image}
+                  alt={item.bookId.name}
+                  className="w-16 h-16 object-cover rounded"
+                />
                 <div>
-                  <h2 className="font-semibold text-gray-800 dark:text-white">{item.bookId.name}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">${item.bookId.price}</p>
+                  <h2 className="font-semibold text-gray-800 dark:text-white">
+                    {item.bookId.name}
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    ${item.bookId.price}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => handleQuantityChange(item.bookId._id, item.quantity - 1)}
+                    onClick={() =>
+                      handleQuantityChange(item.bookId._id, item.quantity - 1)
+                    }
                     className="px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded hover:bg-gray-300 dark:hover:bg-slate-600"
                   >
                     -
                   </button>
-                  <span className="text-gray-800 dark:text-white">{item.quantity}</span>
+                  <span className="text-gray-800 dark:text-white">
+                    {item.quantity}
+                  </span>
                   <button
-                    onClick={() => handleQuantityChange(item.bookId._id, item.quantity + 1)}
+                    onClick={() =>
+                      handleQuantityChange(item.bookId._id, item.quantity + 1)
+                    }
                     className="px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded hover:bg-gray-300 dark:hover:bg-slate-600"
                   >
                     +
@@ -105,7 +129,9 @@ const Cart = () => {
             </div>
           ))}
           <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-md dark:bg-slate-800">
-            <h3 className="font-semibold text-gray-800 dark:text-white">Total: ${total.toFixed(2)}</h3>
+            <h3 className="font-semibold text-gray-800 dark:text-white">
+              Total: ${total.toFixed(2)}
+            </h3>
             <div className="space-x-4">
               <button
                 onClick={handleClearCart}
@@ -113,12 +139,12 @@ const Cart = () => {
               >
                 Clear Cart
               </button>
-              <button
-                onClick={() => toast.success("Proceeding to checkout")}
+              <Link
+                to="/checkout"
                 className="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600"
               >
-                Checkout
-              </button>
+                Proceed to Checkout
+              </Link>
             </div>
           </div>
         </div>

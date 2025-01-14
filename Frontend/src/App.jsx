@@ -10,12 +10,13 @@ import Buy from "./components/Buy";
 import Cart from "./components/Cart"; // Importing Cart component
 import { AuthProvider, useAuth } from "./context/AuthProvider.jsx";
 import Navbar from "./components/Navbar";
-import Login from "./components/Login";
+import Login from "./components/Login"; // Importing Login component
 import Dashboard from "./components/Dashboard/Dashboard";
 import SearchResults from "./components/SearchResults";
 
 import ChatInterface from './components/Chat/ChatInterface';
 import ChatButton from "./components/Chat/ChatButton.jsx";
+import Checkout from './components/Checkout'; // Importing Checkout component
 
 function App() {
   const { authUser } = useAuth();
@@ -23,7 +24,6 @@ function App() {
   return (
     <div className="min-h-screen dark:bg-slate-900 dark:text-white">
       <Navbar />
-      <Login />
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -41,6 +41,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/cart" element={<Cart />} /> {/* Added Cart route */}
+          <Route path="/checkout" element={<Checkout />} /> {/* Added Checkout route */}
+          <Route path="/login" element={<Login />} /> {/* Added Login route */}
           <Route
             path="/dashboard/*"
             element={
@@ -53,8 +55,7 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <ChatButton></ChatButton>
-       
+        <ChatButton />
         <Toaster />
       </div>
     </div>
