@@ -29,10 +29,7 @@ const SearchBar = ({ searchTerm, onSearch, onSearchClick }) => (
 
 function Navbar() {
   const navigate = useNavigate();
-  const { authUser } = useAuth();
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
-  );
+  const { authUser, theme, toggleTheme } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [sticky, setSticky] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -57,19 +54,6 @@ function Navbar() {
       }
     }
   };
-
-  useEffect(() => {
-    const element = document.documentElement;
-    if (theme === "dark") {
-      element.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-      document.body.classList.add("dark");
-    } else {
-      element.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-      document.body.classList.remove("dark");
-    }
-  }, [theme]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -139,7 +123,7 @@ function Navbar() {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={toggleTheme}
                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
               >
                 {theme === "dark" ? (
@@ -192,9 +176,9 @@ function Navbar() {
           ))}
           <div className="flex items-center justify-between px-4 pt-4 border-t dark:border-slate-700">
             <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-            >
+              >
               {theme === "dark" ? (
                 <FaSun className="h-5 w-5 text-yellow-400" />
               ) : (
@@ -212,7 +196,7 @@ function Navbar() {
                 className="flex items-center space-x-2 px-4 py-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors"
               >
                 <FaUser className="h-4 w-4" />
-                <span >Login</span>
+                <span>Login</span>
               </button>
             )}
           </div>

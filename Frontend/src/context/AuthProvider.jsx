@@ -14,6 +14,10 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [cartItems, setCartItems] = useState([]);
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme ? savedTheme : "light";
+  });
 
   // Fetch cart items on user login
   useEffect(() => {
@@ -21,6 +25,12 @@ export const AuthProvider = ({ children }) => {
       fetchCartItems();
     }
   }, [authUser]);
+
+  // Update theme in localStorage and apply to document
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
   const fetchCartItems = async () => {
     try {
@@ -101,6 +111,10 @@ export const AuthProvider = ({ children }) => {
     setCartItems([]);
   };
 
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
+
   const value = {
     authUser,
     setAuthUser,
@@ -110,6 +124,8 @@ export const AuthProvider = ({ children }) => {
     clearCart,
     handleLogin,
     handleLogout,
+    theme,
+    toggleTheme,
     token: localStorage.getItem("Token")
   };
 
