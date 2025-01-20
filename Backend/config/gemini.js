@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export const geminiModel = genAI.getGenerativeModel({
   model: "gemini-pro",
   generationConfig: {
-    maxOutputTokens: 100, // Adjust this number to control response length
+    maxOutputTokens: 200, // Adjust this number to control response length
   },
 });
 
