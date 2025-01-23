@@ -1,179 +1,244 @@
-import React, { useState } from "react";
-import { useAuth } from "../context/AuthProvider"; // Use AuthProvider for cart context
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
 const Checkout = () => {
-  const { cartItems, theme } = useAuth(); // Access cart items and theme from AuthProvider
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const { cartItems, clearCart } = useAuth();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    deliveryDate: "",
+    paymentMethod: "card",
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const totalAmount = cartItems.reduce(
     (total, item) => total + item.bookId.price * item.quantity,
     0
   );
 
-  const handleOrderConfirmation = async () => {
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      navigate("/cart");
+      toast.error("Your cart is empty");
+    }
+  }, [cartItems, navigate]);
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const validateForm = () => {
+    const requiredFields = [
+      "address",
+      "city",
+      "state",
+      "zipCode",
+      "deliveryDate",
+    ];
+    return requiredFields.every((field) => formData[field].trim());
+  };
+
+  const handleOrderConfirmation = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const orderDetails = {
         items: cartItems,
         totalAmount,
         address: {
-          street: address,
-          city,
-          state,
-          zipCode,
+          street: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
         },
-        deliveryDate,
+        deliveryDate: formData.deliveryDate,
+        paymentMethod: formData.paymentMethod,
       };
-      // Send order details to the backend
+
       await axios.post(
         "https://bookstoreapp-master.onrender.com/order",
         orderDetails
       );
-      toast.success("Order confirmed!");
+      await clearCart();
+      toast.success("Order placed successfully!");
+      navigate("/orders");
     } catch (error) {
-      console.error("Error confirming order:", error);
-      toast.error("Failed to confirm order");
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900" : "bg-indigo-100"} py-8 px-4 sm:px-6 lg:px-8`}>
-      <div className={`max-w-3xl mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-indigo-50"} rounded-lg shadow-lg p-6`}>
-        <h1 className={`text-3xl font-bold ${theme === "dark" ? "text-white" : "text-indigo-900"} mb-6`}>Checkout</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-6 sm:p-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+              Checkout
+            </h1>
 
-        <div className="space-y-6">
-          <div className={`bg-indigo-50 p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : ""}`}>
-            <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-indigo-800"} mb-4`}>
-              Your Cart
-            </h2>
-            {cartItems.map((item) => (
-              <div
-                key={item.bookId._id}
-                className={`flex items-center space-x-4 py-4 border-b ${theme === "dark" ? "border-gray-600" : "border-indigo-200"}`}
-              >
-                <img
-                  src={item.bookId.image}
-                  alt={item.bookId.name}
-                  className="w-16 h-16 object-cover rounded"
-                />
-                <div>
-                  <p className={`${theme === "dark" ? "text-white" : "text-indigo-700"}`}>
-                    {item.bookId.name} - ${item.bookId.price} x {item.quantity}
-                  </p>
+            <div className="space-y-8">
+              {/* Order Summary */}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Order Summary
+                </h2>
+                <div className="space-y-4">
+                  {cartItems.map((item) => (
+                    <div
+                      key={item.bookId._id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={item.bookId.image}
+                          alt={item.bookId.name}
+                          className="w-16 h-20 object-cover rounded-lg"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {item.bookId.name}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-300">
+                            Quantity: {item.quantity}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        ${(item.bookId.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div className="flex justify-between">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        Total
+                      </p>
+                      <p className="text-lg font-semibold text-pink-600">
+                        ${totalAmount.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
 
-          <div className={`bg-indigo-50 p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : ""}`}>
-            <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-indigo-800"} mb-4`}>
-              Total Amount
-            </h2>
-            <p className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-indigo-900"}`}>
-              ${totalAmount.toFixed(2)}
-            </p>
-          </div>
+              {/* Delivery Details Form */}
+              <form onSubmit={handleOrderConfirmation} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Street Address
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                      required
+                    />
+                  </div>
 
-          <div className={`bg-indigo-50 p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-700" : ""}`}>
-            <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-indigo-800"} mb-4`}>
-              Delivery Details
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="address"
-                  className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-indigo-700"}`}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        ZIP Code
+                      </label>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        value={formData.zipCode}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Delivery Date
+                    </label>
+                    <input
+                      type="date"
+                      name="deliveryDate"
+                      value={formData.deliveryDate}
+                      onChange={handleInputChange}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Payment Method
+                    </label>
+                    <select
+                      name="paymentMethod"
+                      value={formData.paymentMethod}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                    >
+                      <option value="card">Credit/Debit Card</option>
+                      <option value="upi">UPI</option>
+                      <option value="cod">Cash on Delivery</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors disabled:opacity-50"
                 >
-                  Street Address
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  placeholder="Enter your street address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className={`mt-1 block w-full rounded-md border ${theme === "dark" ? "border-gray-600" : "border-indigo-300"} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label
-                    htmlFor="city"
-                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-indigo-700"}`}
-                  >
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    id="city"
-                    placeholder="Enter your city"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className={`mt-1 block w-full rounded-md border ${theme === "dark" ? "border-gray-600" : "border-indigo-300"} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="state"
-                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-indigo-700"}`}
-                  >
-                    State
-                  </label>
-                  <input
-                    type="text"
-                    id="state"
-                    placeholder="Enter your state"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    className={`mt-1 block w-full rounded-md border ${theme === "dark" ? "border-gray-600" : "border-indigo-300"} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="zipCode"
-                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-indigo-700"}`}
-                  >
-                    Zip Code
-                  </label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    placeholder="Enter your zip code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
-                    className={`mt-1 block w-full rounded-md border ${theme === "dark" ? "border-gray-600" : "border-indigo-300"} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="deliveryDate"
-                  className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-indigo-700"}`}
-                >
-                  Delivery Date
-                </label>
-                <input
-                  type="date"
-                  id="deliveryDate"
-                  value={deliveryDate}
-                  onChange={(e) => setDeliveryDate(e.target.value)}
-                  className={`mt-1 block w-full rounded-md border ${theme === "dark" ? "border-gray-600" : "border-indigo-300"} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
-                />
-              </div>
+                  {isLoading ? "Processing..." : "Place Order"}
+                </button>
+              </form>
             </div>
           </div>
-
-          <button
-            onClick={handleOrderConfirmation}
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Confirm Order
-          </button>
         </div>
       </div>
     </div>

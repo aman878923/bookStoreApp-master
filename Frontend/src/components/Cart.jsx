@@ -2,29 +2,34 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const { authUser, cartItems, addToCart, removeFromCart, clearCart } =
-    useAuth();
+  const { authUser, cartItems, addToCart, removeFromCart, clearCart } = useAuth();
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (authUser) {
       fetchCart();
     }
-  }, [authUser, cartItems]);
+  }, [authUser]);
 
   const fetchCart = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `https://bookstoreapp-master.onrender.com/cart/${authUser._id}`
       );
-      setCart(response.data.items || []);
-      calculateTotal(response.data.items || []);
+      const items = response.data.items || [];
+      setCart(items);
+      calculateTotal(items);
     } catch (error) {
+      toast.error("Failed to fetch cart items");
       console.error("Error fetching cart:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -36,119 +41,153 @@ const Cart = () => {
     setTotal(totalPrice);
   };
 
-  const handleQuantityChange = async (bookId, quantity) => {
-    if (quantity < 1) return;
+  const handleQuantityChange = async (bookId, newQuantity) => {
+    if (newQuantity < 1) return;
+    
+    // Optimistic update
+    const updatedCart = cart.map(item => 
+      item.bookId._id === bookId 
+        ? { ...item, quantity: newQuantity }
+        : item
+    );
+    
+    setCart(updatedCart);
+    calculateTotal(updatedCart);
+
     try {
-      await addToCart(bookId, quantity);
-      fetchCart();
-      toast.success("Quantity updated successfully");
+      await addToCart(bookId, newQuantity);
+      toast.success("Quantity updated");
     } catch (error) {
-      console.error("Error updating quantity:", error);
+      // Revert on failure
+      fetchCart();
       toast.error("Failed to update quantity");
     }
   };
 
   const handleRemoveItem = async (bookId) => {
+    // Optimistic update
+    const updatedCart = cart.filter(item => item.bookId._id !== bookId);
+    setCart(updatedCart);
+    calculateTotal(updatedCart);
+
     try {
       await removeFromCart(bookId);
-      fetchCart();
       toast.success("Item removed from cart");
     } catch (error) {
-      console.error("Error removing item:", error);
+      // Revert on failure
+      fetchCart();
       toast.error("Failed to remove item");
     }
   };
 
   const handleClearCart = async () => {
+    // Optimistic update
+    setCart([]);
+    setTotal(0);
+
     try {
       await clearCart();
-      fetchCart();
-      toast.success("Cart cleared successfully");
+      toast.success("Cart cleared");
     } catch (error) {
-      console.error("Error clearing cart:", error);
+      // Revert on failure
+      fetchCart();
       toast.error("Failed to clear cart");
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 flex items-center justify-center">
+        <div className="text-xl text-gray-600 dark:text-gray-300">Loading cart...</div>
+      </div>
+    );
+  }
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 dark:text-white">Your Cart</h1>
-      {cart.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-300">Your cart is empty.</p>
-      ) : (
-        <div className="space-y-4">
-          {cart.map((item) => (
-            <div
-              key={item.bookId._id}
-              className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md dark:bg-slate-800"
-            >
-              <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">
+          Shopping Cart
+        </h1>
+        
+        {cart.length === 0 ? (
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <h3 className="text-xl text-gray-600 dark:text-gray-300">Your cart is empty</h3>
+            <Link to="/" className="mt-4 inline-block px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
+              Continue Shopping
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {cart.map((item) => (
+              <div
+                key={item.bookId._id}
+                className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm transition-all hover:shadow-md"
+              >
                 <img
                   src={item.bookId.image}
                   alt={item.bookId.name}
-                  className="w-16 h-16 object-cover rounded"
+                  className="w-24 h-32 object-cover rounded-lg"
                 />
-                <div>
-                  <h2 className="font-semibold text-gray-800 dark:text-white">
+                <div className="flex-1 space-y-2">
+                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
                     {item.bookId.name}
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-lg font-medium text-pink-500">
                     ${item.bookId.price}
                   </p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <button
+                      onClick={() => handleQuantityChange(item.bookId._id, item.quantity - 1)}
+                      className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="w-12 text-center font-medium text-gray-800 dark:text-white">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => handleQuantityChange(item.bookId._id, item.quantity + 1)}
+                      className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
                   <button
-                    onClick={() =>
-                      handleQuantityChange(item.bookId._id, item.quantity - 1)
-                    }
-                    className="px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded hover:bg-gray-300 dark:hover:bg-slate-600"
+                    onClick={() => handleRemoveItem(item.bookId._id)}
+                    className="text-red-500 hover:text-red-700 font-medium transition-colors"
                   >
-                    -
-                  </button>
-                  <span className="text-gray-800 dark:text-white">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() =>
-                      handleQuantityChange(item.bookId._id, item.quantity + 1)
-                    }
-                    className="px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded hover:bg-gray-300 dark:hover:bg-slate-600"
-                  >
-                    +
+                    Remove
                   </button>
                 </div>
-                <button
-                  onClick={() => handleRemoveItem(item.bookId._id)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
+              </div>
+            ))}
+            
+            <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+                  Total: ${total.toFixed(2)}
+                </h3>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={handleClearCart}
+                    className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Clear Cart
+                  </button>
+                  <Link
+                    to="/checkout"
+                    className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-center"
+                  >
+                    Proceed to Checkout
+                  </Link>
+                </div>
               </div>
             </div>
-          ))}
-          <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-md dark:bg-slate-800">
-            <h3 className="font-semibold text-gray-800 dark:text-white">
-              Total: ${total.toFixed(2)}
-            </h3>
-            <div className="space-x-4">
-              <button
-                onClick={handleClearCart}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                Clear Cart
-              </button>
-              <Link
-                to="/checkout"
-                className="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600"
-              >
-                Proceed to Checkout
-              </Link>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
