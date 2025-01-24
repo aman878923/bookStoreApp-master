@@ -1,246 +1,170 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthProvider";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthProvider";
 
 const Checkout = () => {
-  const { cartItems, clearCart } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    address: "",
+  const { authUser, cartItems, addToCart, removeFromCart, clearCart } =
+    useAuth();
+  const [shippingAddress, setShippingAddress] = useState({
+    street: "",
     city: "",
     state: "",
     zipCode: "",
-    deliveryDate: "",
-    paymentMethod: "card",
+    country: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const totalAmount = cartItems.reduce(
-    (total, item) => total + item.bookId.price * item.quantity,
-    0
-  );
+  const [paymentMethod, setPaymentMethod] = useState("credit_card");
 
   useEffect(() => {
-    if (cartItems.length === 0) {
-      navigate("/cart");
-      toast.error("Your cart is empty");
+    if (!authUser || !cartItems || cartItems.length === 0) {
+      navigate('/cart');
     }
-  }, [cartItems, navigate]);
+  }, [authUser, cartItems, navigate]);
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const validateForm = () => {
-    const requiredFields = [
-      "address",
-      "city",
-      "state",
-      "zipCode",
-      "deliveryDate",
-    ];
-    return requiredFields.every((field) => formData[field].trim());
-  };
-
-  const handleOrderConfirmation = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    setIsLoading(true);
     try {
-      const orderDetails = {
-        items: cartItems,
-        totalAmount,
-        address: {
-          street: formData.address,
-          city: formData.city,
-          state: formData.state,
-          zipCode: formData.zipCode,
+      const response = await fetch("/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        deliveryDate: formData.deliveryDate,
-        paymentMethod: formData.paymentMethod,
-      };
+        body: JSON.stringify({
+          books: cartItems.map((item) => ({
+            book: item._id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          shippingAddress,
+          paymentMethod,
+          totalAmount: cartItems.reduce((total, item) => total + (item.price * item.quantity), 0),
+        }),
+      });
 
-      await axios.post(
-        "https://bookstoreapp-master.onrender.com/order",
-        orderDetails
-      );
-      await clearCart();
-      toast.success("Order placed successfully!");
-      navigate("/orders");
+      const data = await response.json();
+      if (data.success) {
+        clearCart();
+        navigate(`/order-success/${data.order._id}`);
+      }
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
-    } finally {
-      setIsLoading(false);
+      console.error("Order creation failed:", error);
     }
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-6 sm:p-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              Checkout
-            </h1>
+    <div className="max-w-4xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6">Checkout</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-semibold mb-4">Shipping Address</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Street Address"
+              className="input input-bordered w-full"
+              value={shippingAddress.street}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  street: e.target.value,
+                })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="City"
+              className="input input-bordered w-full"
+              value={shippingAddress.city}
+              onChange={(e) =>
+                setShippingAddress({ ...shippingAddress, city: e.target.value })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="State"
+              className="input input-bordered w-full"
+              value={shippingAddress.state}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  state: e.target.value,
+                })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="ZIP Code"
+              className="input input-bordered w-full"
+              value={shippingAddress.zipCode}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  zipCode: e.target.value,
+                })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="Country"
+              className="input input-bordered w-full"
+              value={shippingAddress.country}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  country: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
+        </div>
 
-            <div className="space-y-8">
-              {/* Order Summary */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Order Summary
-                </h2>
-                <div className="space-y-4">
-                  {cartItems.map((item) => (
-                    <div
-                      key={item.bookId._id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <img
-                          src={item.bookId.image}
-                          alt={item.bookId.name}
-                          className="w-16 h-20 object-cover rounded-lg"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {item.bookId.name}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-300">
-                            Quantity: {item.quantity}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        ${(item.bookId.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
-                    <div className="flex justify-between">
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Total
-                      </p>
-                      <p className="text-lg font-semibold text-pink-600">
-                        ${totalAmount.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-semibold mb-4">Payment Method</h3>
+          <select
+            className="select select-bordered w-full"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+          >
+            <option value="credit_card">Credit Card</option>
+            <option value="debit_card">Debit Card</option>
+            <option value="paypal">PayPal</option>
+          </select>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
+          <div className="space-y-2">
+            {cartItems.map((item) => (
+              <div key={item._id} className="flex justify-between">
+                <span>
+                  {item.name} x {item.quantity}
+                </span>
+                <span>${(item.price * item.quantity).toFixed(2)}</span>
               </div>
-
-              {/* Delivery Details Form */}
-              <form onSubmit={handleOrderConfirmation} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Street Address
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        State
-                      </label>
-                      <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        ZIP Code
-                      </label>
-                      <input
-                        type="text"
-                        name="zipCode"
-                        value={formData.zipCode}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Delivery Date
-                    </label>
-                    <input
-                      type="date"
-                      name="deliveryDate"
-                      value={formData.deliveryDate}
-                      onChange={handleInputChange}
-                      min={new Date().toISOString().split("T")[0]}
-                      className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Payment Method
-                    </label>
-                    <select
-                      name="paymentMethod"
-                      value={formData.paymentMethod}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                    >
-                      <option value="card">Credit/Debit Card</option>
-                      <option value="upi">UPI</option>
-                      <option value="cod">Cash on Delivery</option>
-                    </select>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors disabled:opacity-50"
-                >
-                  {isLoading ? "Processing..." : "Place Order"}
-                </button>
-              </form>
+            ))}
+            <div className="border-t pt-2 mt-2">
+              <div className="flex justify-between font-bold">
+                <span>Total:</span>
+                <span>${calculateTotal().toFixed(2)}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+        <button type="submit" className="btn btn-primary w-full">
+          Place Order
+        </button>
+      </form>
     </div>
   );
 };

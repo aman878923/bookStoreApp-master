@@ -13,6 +13,7 @@ import morgan from "morgan";
 import { setupSocket } from "./config/socket.js";
 import chatRoutes from "./route/chat.route.js";
 import http from "http";
+import orderRoute from "./route/order.route.js";
 
 const app = express();
 dotenv.config();
@@ -66,6 +67,7 @@ app.use("/book", bookRoute);
 app.use("/user", userRoute);
 app.use("/contact", contactRoute);
 app.use("/cart", cartRoute);
+app.use("/order", orderRoute);
 
 app.use("/api/chat", chatRoutes);
 
