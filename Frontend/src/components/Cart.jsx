@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 
 const Cart = () => {
   const { authUser, cartItems, addToCart, removeFromCart, clearCart } = useAuth();
-  const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -14,7 +13,7 @@ const Cart = () => {
     if (authUser) {
       fetchCart();
     }
-  }, [authUser]);
+  }, [authUser, cartItems]);
 
   const fetchCart = async () => {
     setIsLoading(true);
@@ -23,7 +22,6 @@ const Cart = () => {
         `https://bookstoreapp-master.onrender.com/cart/${authUser._id}`
       );
       const items = response.data.items || [];
-      setCart(items);
       calculateTotal(items);
     } catch (error) {
       toast.error("Failed to fetch cart items");
@@ -44,53 +42,31 @@ const Cart = () => {
   const handleQuantityChange = async (bookId, newQuantity) => {
     if (newQuantity < 1) return;
     
-    // Optimistic update
-    const updatedCart = cart.map(item => 
-      item.bookId._id === bookId 
-        ? { ...item, quantity: newQuantity }
-        : item
-    );
-    
-    setCart(updatedCart);
-    calculateTotal(updatedCart);
-
     try {
       await addToCart(bookId, newQuantity);
+      calculateTotal(cartItems);
       toast.success("Quantity updated");
     } catch (error) {
-      // Revert on failure
-      fetchCart();
       toast.error("Failed to update quantity");
     }
   };
 
   const handleRemoveItem = async (bookId) => {
-    // Optimistic update
-    const updatedCart = cart.filter(item => item.bookId._id !== bookId);
-    setCart(updatedCart);
-    calculateTotal(updatedCart);
-
     try {
       await removeFromCart(bookId);
+      calculateTotal(cartItems);
       toast.success("Item removed from cart");
     } catch (error) {
-      // Revert on failure
-      fetchCart();
       toast.error("Failed to remove item");
     }
   };
 
   const handleClearCart = async () => {
-    // Optimistic update
-    setCart([]);
-    setTotal(0);
-
     try {
       await clearCart();
+      setTotal(0);
       toast.success("Cart cleared");
     } catch (error) {
-      // Revert on failure
-      fetchCart();
       toast.error("Failed to clear cart");
     }
   };
@@ -102,6 +78,15 @@ const Cart = () => {
       </div>
     );
   }
+
+  if (!authUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 flex items-center justify-center">
+        <div className="text-xl text-gray-600 dark:text-gray-300">Please login to view your cart</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -109,7 +94,7 @@ const Cart = () => {
           Shopping Cart
         </h1>
         
-        {cart.length === 0 ? (
+        {cartItems.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <h3 className="text-xl text-gray-600 dark:text-gray-300">Your cart is empty</h3>
             <Link to="/" className="mt-4 inline-block px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
@@ -118,7 +103,7 @@ const Cart = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {cart.map((item) => (
+            {cartItems.map((item) => (
               <div
                 key={item.bookId._id}
                 className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm transition-all hover:shadow-md"

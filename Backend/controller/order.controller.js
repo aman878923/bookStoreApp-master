@@ -3,10 +3,8 @@ import { sendOrderConfirmationEmail } from '../utils/emailService.js';
 
 export const createOrder = async (req, res) => {
     try {
-        const { books, shippingAddress, paymentMethod } = req.body;
+        const { books, shippingAddress, paymentMethod, totalAmount } = req.body;
         const userId = req.user.id;
-
-        const totalAmount = books.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
         const order = await Order.create({
             user: userId,
@@ -17,7 +15,6 @@ export const createOrder = async (req, res) => {
         });
 
         await order.populate('books.book');
-        await sendOrderConfirmationEmail(req.user.email, order);
 
         res.status(201).json({
             success: true,
@@ -31,6 +28,7 @@ export const createOrder = async (req, res) => {
         });
     }
 };
+
 
 export const getUserOrders = async (req, res) => {
     try {
