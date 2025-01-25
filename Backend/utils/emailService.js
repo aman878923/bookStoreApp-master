@@ -15,11 +15,13 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendOrderConfirmationEmail = async (userEmail, order) => {
+  // Map through books array with correct property access
   const orderItemsHtml = order.books.map(item => `
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.book.name}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity}</td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee;">$${item.price}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">$${(item.price).toFixed(2)}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">$${(item.price * item.quantity).toFixed(2)}</td>
     </tr>
   `).join('');
 
@@ -34,7 +36,7 @@ export const sendOrderConfirmationEmail = async (userEmail, order) => {
             <h1 style="color: #ec4899; text-align: center;">Thank You for Your Order!</h1>
             
             <p style="color: #374151;">Order ID: ${order._id}</p>
-            <p style="color: #374151;">Order Date: ${new Date(order.orderDate).toLocaleDateString()}</p>
+            <p style="color: #374151;">Order Date: ${new Date().toLocaleDateString()}</p>
             
             <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
               <thead>
@@ -42,6 +44,7 @@ export const sendOrderConfirmationEmail = async (userEmail, order) => {
                   <th style="padding: 10px; text-align: left;">Book</th>
                   <th style="padding: 10px; text-align: left;">Quantity</th>
                   <th style="padding: 10px; text-align: left;">Price</th>
+                  <th style="padding: 10px; text-align: left;">Subtotal</th>
                 </tr>
               </thead>
               <tbody>
@@ -49,8 +52,8 @@ export const sendOrderConfirmationEmail = async (userEmail, order) => {
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="2" style="padding: 10px; text-align: right; font-weight: bold;">Total:</td>
-                  <td style="padding: 10px; font-weight: bold;">$${order.totalAmount}</td>
+                  <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">Total:</td>
+                  <td style="padding: 10px; font-weight: bold;">$${order.totalAmount.toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>
