@@ -126,7 +126,8 @@ export const AuthProvider = ({ children }) => {
     handleLogout,
     theme,
     toggleTheme,
-    token: localStorage.getItem("Token")
+    token: localStorage.getItem("Token"),
+    fetchCartItems 
   };
 
   return (
