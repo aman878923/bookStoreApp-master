@@ -15,6 +15,16 @@ export const createOrder = async (req, res) => {
         });
 
         await order.populate('books.book');
+        await sendOrderConfirmationEmail({
+            email: req.user.email,
+            orderDetails: {
+                orderId: order._id,
+                books: order.books,
+                totalAmount: order.totalAmount,
+                shippingAddress: order.shippingAddress
+            }
+        });
+
 
         res.status(201).json({
             success: true,
