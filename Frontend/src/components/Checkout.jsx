@@ -33,11 +33,11 @@ const Checkout = () => {
     
         setIsSubmitting(true);
         try {
-            const response = await fetch("http://localhost:4000/order/create", {
+            const response = await fetch("https://bookstoreapp-master.onrender.com/order/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Authorization: `Bearer ${localStorage.getItem("Token")}`,
                 },
                 body: JSON.stringify({
                     books: cartItems.map(item => ({
