@@ -26,7 +26,7 @@ const Checkout = () => {
   const calculateTotal = () => {
     return (
       cartItems?.reduce(
-        (total, item) => total + item.price * item.quantity,
+        (total, item) => total + item.bookId.price * item.quantity,
         0
       ) || 0
     );
@@ -135,6 +135,12 @@ const Checkout = () => {
                 <span>${(item.bookId.price * item.quantity).toFixed(2)}</span>
               </div>
             ))}
+            <div className="border-t pt-4 mt-4">
+              <div className="flex justify-between items-center font-bold">
+                <span>Total Amount:</span>
+                <span>${calculateTotal().toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </div>
 
