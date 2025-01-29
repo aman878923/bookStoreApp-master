@@ -16,8 +16,9 @@ const router = express.Router();
 // Public routes first
 router.get("/", getBook);
 router.get("/search", searchBooks);
+router.get("/count", getBookCount);
 router.get("/:id", getBookById);
-router.get('/count', getBookCount);
+
 
 
 // Protected review routes
