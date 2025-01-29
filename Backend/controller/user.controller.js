@@ -113,6 +113,20 @@ export const getUserCount = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving user count' });
     }
 }
+// user.controller.js
+
+
+
+export const getRecentUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+      .sort({ createdAt: -1 })
+      .limit(10);
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching recent users" });
+  }
+};
 
 export const login = async (req, res) => {
   try {

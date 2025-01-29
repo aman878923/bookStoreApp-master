@@ -30,6 +30,48 @@ export const createOrder = async (req, res) => {
     });
   }
 };
+// order.controller.js
+import Order from "../model/order.model";
+
+export const getOrderCount = async (req, res) => {
+  try {
+    const count = await Order.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching order count" });
+  }
+};
+
+export const getRevenue = async (req, res) => {
+  try {
+    const revenue = await Order.aggregate([
+      {
+        $group: {
+          _id: { month: { $month: "$createdAt" } },
+          amount: { $sum: "$totalAmount" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+    res.status(200).json(revenue);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching revenue data" });
+  }
+};
+
+export const getRecentOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate("user");
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching recent orders" });
+  }
+};
 
 export const getUserOrders = async (req, res) => {
   try {
