@@ -31,7 +31,6 @@ export const createOrder = async (req, res) => {
   }
 };
 // order.controller.js
-import Order from "../model/order.model";
 
 export const getOrderCount = async (req, res) => {
   try {
