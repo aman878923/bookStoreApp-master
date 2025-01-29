@@ -8,6 +8,8 @@ import {
   deleteReview,
 } from "../controller/book.controller.js";
 import { authenticateJWT } from "../middleware/auth.js";
+import { getBookCount } from '../controller/book.controller.js';
+
 
 const router = express.Router();
 
@@ -15,6 +17,8 @@ const router = express.Router();
 router.get("/", getBook);
 router.get("/search", searchBooks);
 router.get("/:id", getBookById);
+router.get('/count', getBookCount);
+
 
 // Protected review routes
 router.post("/:id/reviews", authenticateJWT, addReview);

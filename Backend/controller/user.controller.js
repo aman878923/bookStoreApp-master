@@ -38,6 +38,7 @@ const getPasswordErrorMessage = (validationResult) => {
     (error) => errorMessages[error.validation] || error.message
   );
 };
+
 export const signup = async (req, res) => {
   console.log("Signup request received:", req.body);
   try {
@@ -103,7 +104,15 @@ export const signup = async (req, res) => {
   }
 };
 
-// import { generateToken } from "../utils/jwt.js";
+// New method to get user count
+export const getUserCount = async (req, res) => {
+    try {
+        const count = await User.countDocuments();
+        res.status(200).json({ count });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving user count' });
+    }
+}
 
 export const login = async (req, res) => {
   try {

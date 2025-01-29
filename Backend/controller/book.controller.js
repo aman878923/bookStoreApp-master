@@ -20,6 +20,14 @@ export const getBookById = async (req, res) => {
     res.status(500).json({ message: "Error fetching book id" });
   }
 };
+export const getBookCount = async (req, res) => {
+  try {
+      const count = await Book.countDocuments();
+      res.status(200).json({ count });
+  } catch (error) {
+      res.status(500).json({ message: 'Error retrieving book count' });
+  }
+}
 
 export const searchBooks = async (req, res) => {
   try {
@@ -104,21 +112,24 @@ export const updateReview = async (req, res) => {
     }
 
     if (reviewToUpdate.userId.toString() !== userId) {
-      return res.status(403).json({ message: "Unauthorized to update this review" });
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to update this review" });
     }
 
     reviewToUpdate.rating = rating;
     reviewToUpdate.review = review;
-    
+
     await book.save();
 
     res.status(200).json({ message: "Review updated successfully", book });
   } catch (error) {
     console.error("Update review error:", error);
-    res.status(500).json({ message: "Error updating review", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating review", error: error.message });
   }
 };
-
 
 export const deleteReview = async (req, res) => {
   try {
