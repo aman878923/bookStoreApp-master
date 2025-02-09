@@ -35,7 +35,7 @@ const AdminRegistration = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('/api/admin/register', formData, {
+      const response = await axios.post('https://bookstoreapp-master.onrender.com/api/admin/register', formData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
