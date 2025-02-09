@@ -1,6 +1,5 @@
 import AdminUser from '../models/adminUser.model.js';
-import { generateToken } from '../utils/generateToken.js';
-import { transporter } from '../config/nodemailer.js';
+import { transporter } from '../config/emailConfig.js';
 
 export const registerAdmin = async (req, res) => {
   try {
@@ -30,12 +29,6 @@ export const registerAdmin = async (req, res) => {
     });
 
     await newAdmin.save();
-
-    const token = generateToken({
-      id: newAdmin._id,
-      email: newAdmin.email,
-      role: newAdmin.role
-    });
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -82,7 +75,6 @@ export const registerAdmin = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Admin registered successfully",
-      token,
       admin: {
         id: newAdmin._id,
         fullname: newAdmin.fullname,
