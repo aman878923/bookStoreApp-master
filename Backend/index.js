@@ -12,6 +12,8 @@ import seedPaidBooks from "./inti/modeData.js";
 import morgan from "morgan";
 import { setupSocket } from "./config/socket.js";
 import chatRoutes from "./route/chat.route.js";
+import adminRoutes from './routes/admin.routes.js';
+
 import http from "http";
 import orderRoute from "./route/order.route.js";
 
@@ -68,6 +70,10 @@ app.use("/user", userRoute);
 app.use("/contact", contactRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
+
+// Mount admin routes
+app.use('/api/admin', adminRoutes);
+
 
 app.use("/api/chat", chatRoutes);
 

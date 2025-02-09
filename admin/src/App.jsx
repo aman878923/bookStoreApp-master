@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AdminRegistration from "./components/AdminRegistration";
 
 import "./App.css";
 import Dashboard from "./dashboard/dashboard";
@@ -12,7 +13,7 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<AdminRegistration/>} />
             {/* Other admin routes */}
           </Routes>
         </Layout>
