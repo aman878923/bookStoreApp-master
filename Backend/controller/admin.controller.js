@@ -1,5 +1,5 @@
 import AdminUser from '../models/adminUser.model.js';
-import { transporter } from '../config/emailConfig.js';
+import { transporter } from '../config/nodemailer.js';
 
 export const registerAdmin = async (req, res) => {
   try {
