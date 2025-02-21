@@ -6,12 +6,12 @@ import axios from "axios";
 
 const FilterButton = ({ active, onClick, children }) => (
   <motion.button
-    whileHover={{ scale: 1.05 }}
+    whileHover={{ scale: 1.05, backgroundColor: active ? "" : "#f3f4f6" }}
     whileTap={{ scale: 0.95 }}
-    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+    className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
       active
-        ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg"
-        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:shadow-md border border-gray-200 dark:border-gray-700"
+        ? "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl"
+        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:shadow-lg border-2 border-gray-100 dark:border-gray-700"
     }`}
     onClick={onClick}
   >
@@ -80,32 +80,34 @@ function Course() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-screen-2xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-screen-2xl mx-auto px-6 py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-16"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center max-w-4xl mx-auto mb-20"
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
             Discover Your Next Favorite Book
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-xl leading-relaxed">
             Explore our carefully curated collection of books across various
             genres. Find your perfect read from our extensive library of titles.
           </p>
         </motion.div>
 
         {/* Mobile Filter Toggle */}
-        <div className="md:hidden mb-6">
-          <button
+        <div className="md:hidden mb-8">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowFilters(!showFilters)}
-            className="w-full flex items-center justify-center gap-2 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm"
+            className="w-full flex items-center justify-center gap-3 p-5 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-gray-100 dark:border-gray-700"
           >
-            {showFilters ? <FaTimes /> : <FaFilter />}
-            <span>{showFilters ? "Hide Filters" : "Show Filters"}</span>
-          </button>
+            {showFilters ? <FaTimes className="text-xl" /> : <FaFilter className="text-xl" />}
+            <span className="font-medium">{showFilters ? "Hide Filters" : "Show Filters"}</span>
+          </motion.button>
         </div>
 
         {/* Filters Section */}
@@ -113,15 +115,15 @@ function Course() {
           className={`md:block ${showFilters ? "block" : "hidden"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.4 }}
         >
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg mb-8">
-            <div className="flex flex-col md:flex-row md:items-center gap-8">
-              <div className="flex-1 space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg p-10 rounded-3xl shadow-xl mb-12 border-2 border-gray-100 dark:border-gray-700">
+            <div className="flex flex-col md:flex-row md:items-start gap-12">
+              <div className="flex-1 space-y-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
                   Genre
                 </h3>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-4">
                   {genres.map((genre) => (
                     <FilterButton
                       key={genre}
@@ -134,11 +136,11 @@ function Course() {
                 </div>
               </div>
 
-              <div className="flex-1 space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="flex-1 space-y-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
                   Price Range
                 </h3>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-4">
                   {priceRanges.map((range) => (
                     <FilterButton
                       key={range.value}
@@ -158,25 +160,31 @@ function Course() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
           {isLoading ? (
             <div className="flex justify-center items-center min-h-[400px]">
-              <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <>
-              <div className="flex justify-between items-center mb-8">
-                <p className="text-gray-600 dark:text-gray-300 font-medium">
+              <div className="flex justify-between items-center mb-10">
+                <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">
                   Showing {filteredBooks.length} results
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-4">
                 {filteredBooks.map((item) => (
-                  <div key={item._id} className="flex justify-center">
+                  <motion.div 
+                    key={item._id} 
+                    className="flex justify-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
                     <Cards item={item} />
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </>
