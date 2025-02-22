@@ -170,7 +170,7 @@ function Buy() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 pt-20">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
         <div className="md:flex">
           <div className="md:w-1/3 p-8">
@@ -375,3 +375,4 @@ function Buy() {
 }
 
 export default Buy;
+
