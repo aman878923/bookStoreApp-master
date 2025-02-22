@@ -147,8 +147,6 @@ function Buy() {
     return (sum / book.reviews.length).toFixed(1);
   };
 
-  // ... (rest of the existing code for handling reviews)
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -170,77 +168,99 @@ function Buy() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 pt-20">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-        <div className="md:flex">
+    <div className="container mx-auto px-4 py-8 pt-20 max-w-7xl">
+      {/* Book Details Card */}
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-lg border border-gray-100 dark:border-gray-700">
+        <div className="md:flex gap-8">
+          {/* Image Section */}
           <div className="md:w-1/3 p-8">
-            <img
-              src={book.image}
-              alt={book.name}
-              className="w-full h-auto rounded-lg shadow-lg object-cover"
-            />
+            <div className="relative group">
+              <img
+                src={book.image}
+                alt={book.name}
+                className="w-full h-auto rounded-2xl shadow-xl object-cover transform transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
           </div>
+
+          {/* Content Section */}
           <div className="md:w-2/3 p-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
               {book.name}
             </h1>
-            <div className="flex items-center mb-4">
-              <div className="flex items-center">
+
+            {/* Rating Section */}
+            <div className="flex items-center mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-full w-fit">
+              <div className="flex items-center space-x-1">
                 {[...Array(5)].map((_, index) => (
                   <FaStar
                     key={index}
-                    className={
+                    className={`w-5 h-5 ${
                       index < Math.round(calculateAverageRating())
                         ? "text-yellow-400"
                         : "text-gray-300"
-                    }
+                    }`}
                   />
                 ))}
               </div>
-              <span className="ml-2 text-gray-600 dark:text-gray-400">
-                ({calculateAverageRating()} / 5)
+              <span className="ml-3 text-gray-600 dark:text-gray-300 font-medium">
+                {calculateAverageRating()} / 5
               </span>
             </div>
-            <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              ${book.price}
-            </p>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+
+            {/* Price */}
+            <div className="mb-6">
+              <p className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+                ${book.price}
+              </p>
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg leading-relaxed">
               {book.title}
             </p>
-            <div className="flex items-center space-x-4 mb-6">
+
+            {/* Quantity Controls */}
+            <div className="flex items-center gap-6 mb-8">
+              <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-2">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+                >
+                  <FaMinus className="text-gray-600 dark:text-gray-400" />
+                </button>
+                <span className="w-12 text-center font-semibold text-gray-900 dark:text-white">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+                >
+                  <FaPlus className="text-gray-600 dark:text-gray-400" />
+                </button>
+              </div>
+
+              {/* Add to Cart Button */}
               <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                onClick={handleAddToCart}
+                className="flex-1 py-4 px-8 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-full shadow-lg flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-pink-500/25"
               >
-                <FaMinus className="text-gray-600 dark:text-gray-400" />
-              </button>
-              <span className="text-xl font-semibold text-gray-900 dark:text-white">
-                {quantity}
-              </span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                <FaPlus className="text-gray-600 dark:text-gray-400" />
+                <FaShoppingCart className="text-xl" />
+                <span className="text-lg">Add to Cart</span>
               </button>
             </div>
-            <button 
-              onClick={handleAddToCart}
-              className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg flex items-center justify-center space-x-2 transition-all duration-300"
-            >
-              <FaShoppingCart />
-              <span>Add to Cart</span>
-            </button>
           </div>
         </div>
       </div>
 
-{/* Reviews Section */}
-<div className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+      {/* Reviews Section */}
+      <div className="mt-16">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
           Customer Reviews
         </h2>
 
+        {/* Review Form */}
         {authUser && (
           <form
             onSubmit={(e) => {
@@ -249,46 +269,48 @@ function Buy() {
                 ? handleEditReview(editingReview)
                 : handleSubmitReview(e);
             }}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-10 border border-gray-100 dark:border-gray-700"
           >
-            <div className="mb-4">
-              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+            <div className="mb-6">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-3">
                 {editingReview ? "Edit Rating" : "Your Rating"}
               </label>
-              <div className="flex space-x-2">
+              <div className="flex gap-3">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => setRating(star)}
-                    className="focus:outline-none"
+                    className="focus:outline-none transform transition-transform hover:scale-110"
                   >
                     <FaStar
-                      className={`text-2xl ${
+                      className={`text-3xl ${
                         star <= rating ? "text-yellow-400" : "text-gray-300"
-                      } hover:text-yellow-400 transition-colors`}
+                      } transition-colors`}
                     />
                   </button>
                 ))}
               </div>
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+
+            <div className="mb-6">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-3">
                 {editingReview ? "Edit Review" : "Your Review"}
               </label>
               <textarea
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                className="w-full px-5 py-4 rounded-xl border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none transition-all duration-300"
                 rows="4"
-                placeholder="Write your review here..."
+                placeholder="Share your thoughts about this book..."
                 required
               ></textarea>
             </div>
-            <div className="flex space-x-4">
+
+            <div className="flex gap-4">
               <button
                 type="submit"
-                className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow transition-all duration-300"
+                className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-pink-500/25"
               >
                 {editingReview ? "Update Review" : "Submit Review"}
               </button>
@@ -300,7 +322,7 @@ function Buy() {
                     setReview("");
                     setRating(5);
                   }}
-                  className="px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg shadow transition-all duration-300"
+                  className="px-8 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-lg transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -309,12 +331,13 @@ function Buy() {
           </form>
         )}
 
+        {/* Reviews List */}
         <div className="space-y-6">
           {book.reviews && book.reviews.length > 0 ? (
             book.reviews.map((reviewItem) => (
               <div
                 key={reviewItem._id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -362,8 +385,8 @@ function Buy() {
               </div>
             ))
           ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
                 No reviews yet. Be the first to review!
               </p>
             </div>
@@ -375,4 +398,3 @@ function Buy() {
 }
 
 export default Buy;
-
