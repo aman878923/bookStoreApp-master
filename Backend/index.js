@@ -12,7 +12,6 @@ import seedPaidBooks from "./inti/modeData.js";
 import morgan from "morgan";
 import { setupSocket } from "./config/socket.js";
 import chatRoutes from "./route/chat.route.js";
-import adminRoutes from './routes/admin.routes.js';
 
 import http from "http";
 import orderRoute from "./route/order.route.js";
