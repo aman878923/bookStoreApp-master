@@ -14,6 +14,7 @@ import { setupSocket } from "./config/socket.js";
 import chatRoutes from "./route/chat.route.js";
 
 import http from "http";
+import recommendationRoutes from "./route/recommendation.route.js";
 import orderRoute from "./route/order.route.js";
 
 const app = express();
@@ -69,6 +70,7 @@ app.use("/user", userRoute);
 app.use("/contact", contactRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
+app.use("/api/recommendations", recommendationRoutes);
 
 
 

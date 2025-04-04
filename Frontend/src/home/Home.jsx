@@ -4,6 +4,7 @@ import { FaBook, FaUserGraduate, FaBookReader } from "react-icons/fa";
 import Banner from "../components/Banner";
 import Freebook from "../components/Freebook";
 import Footer from "../components/Footer";
+import Recommendations from '../components/Recomendations';
 
 const StatCard = ({ icon: Icon, count, label }) => (
   <motion.div
@@ -100,6 +101,7 @@ function Home() {
       <FeatureSection />
       <Freebook />
       <NewsletterSection />
+      <Recommendations />
       <Footer />
     </div>
   );

@@ -56,9 +56,36 @@ export const searchBooks = async (req, res) => {
       .json({ message: "Error performing search", error: error.message });
   }
 };
-// Backend/controller/book.controller.js
-// Add these new functions
 
+import UserActivity from "../model/userActivity.model.js";
+
+// Add to your existing book view controller
+export const getBookDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.query; // Get userId from query or auth token
+    
+    const book = await Book.findById(id);
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+    
+    // Record view activity if user is logged in
+    if (userId) {
+      await UserActivity.create({
+        userId,
+        bookId: id,
+        activityType: "view"
+      });
+    }
+    
+    res.status(200).json(book);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update your addReview function to track review activity
 export const addReview = async (req, res) => {
   try {
     const { id } = req.params;
@@ -81,6 +108,14 @@ export const addReview = async (req, res) => {
 
     book.reviews.push(newReview);
     const updatedBook = await book.save();
+    
+    // Record review activity
+    await UserActivity.create({
+      userId,
+      bookId: id,
+      activityType: "review",
+      rating: Number(rating)
+    });
 
     res.status(201).json({
       success: true,
@@ -95,7 +130,6 @@ export const addReview = async (req, res) => {
     });
   }
 };
-
 export const updateReview = async (req, res) => {
   try {
     const { id, reviewId } = req.params;
