@@ -71,8 +71,6 @@ app.use("/contact", contactRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
 
-// Mount admin routes
-app.use('/api/admin', adminRoutes);
 
 
 app.use("/api/chat", chatRoutes);
