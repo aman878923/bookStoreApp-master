@@ -9,14 +9,14 @@ const Recommendations = () => {
 
   useEffect(() => {
     const fetchRecommendations = async () => {
-      if (!user) {
+      if (!authUser) {
         setLoading(false);
         return;
       }
       
       try {
         setLoading(true);
-        const response = await axios.get(`https://bookstoreapp-master.onrender.com/api/recommendations/${user._id}`);
+        const response = await axios.get(`https://bookstoreapp-master.onrender.com/api/recommendations/${authUser._id}`);
         setRecommendations(response.data.recommendations);
       } catch (error) {
         console.error('Error fetching recommendations:', error);
@@ -26,11 +26,11 @@ const Recommendations = () => {
     };
 
     fetchRecommendations();
-  }, [user]);
+  }, [authUser]);
 
   if (loading) return <div className="flex justify-center p-4">Loading recommendations...</div>;
   
-  if (!user) return <div className="p-4">Sign in to see personalized recommendations</div>;
+  if (!authUser) return <div className="p-4">Sign in to see personalized recommendations</div>;
   
   if (recommendations.length === 0) {
     return <div className="p-4">Browse more books to get personalized recommendations!</div>;
