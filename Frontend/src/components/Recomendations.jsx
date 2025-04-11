@@ -88,9 +88,12 @@ const Recommendations = () => {
               <p className="text-sm text-gray-600 mb-3 line-clamp-1">
                 {book.author}
               </p>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-sm font-medium">
-                View Details
-              </button>
+              <Link
+                to={`/buy/${book._id}`}
+                className="px-3 py-1.5 bg-pink-500 text-white text-sm font-medium rounded-full hover:bg-pink-600 transition-colors duration-300"
+              >
+                Buy Now
+              </Link>
             </div>
           </div>
         ))}
