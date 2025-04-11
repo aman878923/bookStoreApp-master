@@ -71,7 +71,7 @@ const Recommendations = () => {
           >
             <div className="relative">
               <img
-                src={book.coverImage || "/default-book-cover.jpg"}
+                src={book.image || "/default-book-cover.jpg"}
                 alt={book.title}
                 className="w-full h-56 object-cover hover:opacity-90 transition-opacity"
               />
