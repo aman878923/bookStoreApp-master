@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 const Recommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { authUser } = useAuth();
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -16,7 +16,7 @@ const Recommendations = () => {
       
       try {
         setLoading(true);
-        const response = await axios.get(`/api/recommendations/${user._id}`);
+        const response = await axios.get(`https://bookstoreapp-master.onrender.com/api/recommendations/${user._id}`);
         setRecommendations(response.data.recommendations);
       } catch (error) {
         console.error('Error fetching recommendations:', error);
