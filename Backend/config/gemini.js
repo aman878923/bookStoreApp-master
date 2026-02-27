@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const geminiModel = genAI.getGenerativeModel({
-  model: "gemini-3-flash-preview",
+  model: "gemini-3.1-pro-preview",
   generationConfig: {
     maxOutputTokens: 200, // Adjust this number to control response length
   },
